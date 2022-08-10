@@ -51,17 +51,17 @@ const config = {
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
       navbar: {
-        title: 'My Site',
+        title: 'Personal Django Wiki',
         logo: {
           alt: 'My Site Logo',
-          src: 'img/logo.svg',
+          src: 'https://static.djangoproject.com/img/icon-touch.e4872c4da341.png',
         },
         items: [
           {
             type: 'doc',
-            docId: 'intro',
+            docId: 'giris',
             position: 'left',
-            label: 'Tutorial',
+            label: 'Notlar',
           },
           {
             href: 'https://github.com/facebook/docusaurus',
