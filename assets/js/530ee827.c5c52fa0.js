@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdjango_wiki=self.webpackChunkdjango_wiki||[]).push([[7426],{4372:o=>{o.exports=JSON.parse('{"permalink":"/django-wiki/blog/tags/docusaurus","page":1,"postsPerPage":10,"totalPages":1,"totalCount":4,"blogDescription":"Blog","blogTitle":"Blog"}')}}]);

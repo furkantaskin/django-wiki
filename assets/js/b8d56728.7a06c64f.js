@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdjango_wiki=self.webpackChunkdjango_wiki||[]).push([[4800],{6460:a=>{a.exports=JSON.parse('{"label":"hello","permalink":"/django-wiki/blog/tags/hello","allTagsPath":"/django-wiki/blog/tags","count":2}')}}]);

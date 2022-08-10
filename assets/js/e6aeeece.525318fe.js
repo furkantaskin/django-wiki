@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdjango_wiki=self.webpackChunkdjango_wiki||[]).push([[7754],{6456:o=>{o.exports=JSON.parse('{"permalink":"/django-wiki/blog/tags/facebook","page":1,"postsPerPage":10,"totalPages":1,"totalCount":1,"blogDescription":"Blog","blogTitle":"Blog"}')}}]);

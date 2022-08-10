@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdjango_wiki=self.webpackChunkdjango_wiki||[]).push([[7729],{3114:a=>{a.exports=JSON.parse('{"label":"facebook","permalink":"/django-wiki/blog/tags/facebook","allTagsPath":"/django-wiki/blog/tags","count":1}')}}]);
