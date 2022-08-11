@@ -59,7 +59,7 @@ const config = {
         items: [
           {
             type: 'doc',
-            docId: 'giris',
+            docId: 'intro',
             position: 'left',
             label: 'Notlar',
           },
