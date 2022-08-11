@@ -6,7 +6,7 @@
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://github.com/django-wiki/blog"/>
     <subtitle>Personal Django Wiki Blog</subtitle>
-    <icon>https://github.com/django-wiki/img/favicon.ico</icon>
+    <icon>https://github.com/django-wiki/https://static.djangoproject.com/img/icon-touch.e4872c4da341.png</icon>
     <entry>
         <title type="html"><![CDATA[Welcome]]></title>
         <id>welcome</id>
