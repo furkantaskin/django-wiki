@@ -1,0 +1,61 @@
+---
+sidebar_position: 2
+custom_edit_url: null
+---
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+import Mermaid from '@theme/Mermaid';
+
+# MVC Nedir
+
+MVC nedir sorusu bu kısımda önemlidir. Django normalde Model-Template-View (MTV) yapısı kullanır ancak dosya isimlendirmeleri MVC yapısına yönlendirmektedir. Buradaki template terimi views ve views for controller terimlerini kapsamaktadır.
+
+Bir MVC yapısal diyagramı şu şekildedir: 
+
+
+
+<Mermaid chart={`
+  flowchart LR;
+  model--updates-->view;
+  view--sees-->user;
+  user--uses-->controller;
+  controller--manipulates-->model;
+`}/>
+
+
+
+## Model
+
+Model bileşeni burada veriyle alakalı tüm işlemleri kastetmektedir. Verilerin, mantıkların ve kuralların kontrol edildiği yer burasıdır. Veri yapısı burada tanımlanır.
+
+## View
+
+Görünüm ve dizilim burada belirlenir. Bir nevi ön yüz olarak da düşünülebilir. Kullanıcıya gösterilecek bileşenler burada oluşturulur.
+
+## Controller
+
+Model ve view arasındaki işlemleri controller belirler ve diğer iki bileşen arasında elçi ve yönetici görevi görerek çalışır. Controller bu kısımda view için verilerin nasıl görüneceğini ve kullanıcıların işlemlerine nasıl bir yanıt verileceğini belirler.
+
+Örnek bir yapı şu şekildedir
+
+<Mermaid chart={`
+  flowchart TB;
+  view[view -> kullanıcı sepete ekle butonuna tıklar];
+  controller[controller -> viewdan gelen güncellemeye göre modele eşyayı ekle komutu gönderir];
+  model[model -> eklenen eşyaya göre sistemi günceller];
+  view--kullanıcıdan gelen veriyi gönder-->controller--değiştir-->model;
+  model--listeyi günceller-->view;
+`}/>
+
+
+<Tabs>
+  <TabItem value="apple" label="Apple" default>
+    This is an apple 🍎
+  </TabItem>
+  <TabItem value="orange" label="Orange">
+    This is an orange 🍊
+  </TabItem>
+  <TabItem value="banana" label="Banana">
+    This is a banana 🍌
+  </TabItem>
+</Tabs>

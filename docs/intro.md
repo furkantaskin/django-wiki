@@ -15,4 +15,5 @@ Bir framework öğrenmenin benim programlama üzerine olan yetkinliğimi artıra
 Burada bir süreliğine Django tanıtıp sonrasında kodla ilgili kısımlara geçeceğim.
 
 ## Django Gerçekte Nedir
-Django, [**MDN**](https://developer.mozilla.org/en-US/docs/Learn/Server-side/Django/Introduction) üzerinde de belirtildiği gibi yüksek seviye ve Python tabanlı bir web frameworküdür. Django bu kısımda hızlı bir geliştirme ve güvenlik desteği sağlamaktadır. Burada MVC yapısı yerine MTV yapısı kullanmaktadır. Burada MVC için gereken bilgiyi [MVC Nedir](mvcnedir.md) sayfasından inceleyebilirsiniz.
+
+Django, [**MDN**](https://developer.mozilla.org/en-US/docs/Learn/Server-side/Django/Introduction) üzerinde de belirtildiği gibi yüksek seviye ve Python tabanlı bir web frameworküdür. Django bu kısımda hızlı bir geliştirme ve güvenlik desteği sağlamaktadır. Burada MVC yapısı yerine MTV yapısı kullanmaktadır. Burada MVC için gereken bilgiyi [**MVC Nedir**](mvcnedir) sayfasından inceleyebilirsiniz.

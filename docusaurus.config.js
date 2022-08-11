@@ -4,13 +4,34 @@
 const lightCodeTheme = require('prism-react-renderer/themes/github');
 const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 
+
+async function createConfig() {
+  const mdxMermaid = await import('mdx-mermaid')
+
+  return {
+    presets: [
+      [
+        'classic',
+        {
+          docs: {
+            remarkPlugins: [mdxMermaid.default],
+          }
+        }
+      ]
+    ]
+  }
+}
+
+module.exports = createConfig;
+
+
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: 'Personal Django Wiki',
   tagline: 'Created wiki for learning Django and keeping notes',
   url: 'https://github.com',
   baseUrl: '/django-wiki/',
-  onBrokenLinks: 'throw',
+  onBrokenLinks: 'warn',
   onBrokenMarkdownLinks: 'warn',
   favicon: 'img/favicon.ico',
 
@@ -77,8 +98,21 @@ const config = {
       prism: {
         theme: lightCodeTheme,
         darkTheme: darkCodeTheme,
+        additionalLanguages: ['powershell', 'rust', 'apacheconf', 'nginx'],
+        magicComments: [
+          {
+            className: 'theme-code-block-highlighted-line',
+            line: 'highlight-next-line',
+            block: { start: 'highlight-start', end: 'highlight-end' },
+          },
+          {
+            className: 'code-block-error-line',
+            line: 'This will error',
+          },
+        ],
+
       },
     }),
 };
-
 module.exports = config;
+
