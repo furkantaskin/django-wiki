@@ -1,0 +1,114 @@
+---
+sidebar_position: 8
+custom_edit_url: null
+description: "Sayfa içindeki alt sayfaları kullanmak ve ana sayfayı alt sayfaya bağlayacak köprü oluşturmak"
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# Alt Sayfa Oluşturmak
+
+Alt sayfalar özellikle blog gibi sistemlerin olmazsa olmazıdır. Her postun kendisine ait sayfası olduğunu düşünerek burada bir alt sayfa açmak bizim için önemli adımlardan birisi olacaktır. Örneğin açtığımız postlardan birisini okumamız gerekiyorsa burada yeni bir terimi kullanacağız: `slug`...
+
+## Nasıl Alt Sayfa Oluşturulur
+
+Öncelikle blog içindeki urls.py içine girerek burada post detay sayfası için bir ayar yapmamız gerekiyor. Burada yapacağımız ilk iş slug parametresini kullanmak olacaktır. Ardından blog içindeki views.py içine Post'a dair bir single fonksiyonu açmak ve buna sadece URL içinden gelen slug değerini kullananların erişebileceği ekran oluşturmak bizim yeni amacımız olacaktır.
+
+
+<Tabs>
+  <TabItem value="urls" label="blog/urls.py" default>
+
+```python
+
+    from django.urls import path
+    from . import views
+
+    urlpatterns = [
+        path('', views.home, name="index"),
+        path('single/<slug:slug>', views.single, name="single")
+    ]
+
+```
+  </TabItem>
+  <TabItem value="views" label="blog/views.py">
+
+```python
+
+    from django.shortcuts import render
+    from .models import Post
+
+
+    def home(request):
+        data = Post.objects.all()
+        return render(request, "index.html", {'posts': data})
+
+    # highlight-start
+    def single(request, slug):
+        data = Post.objects.get(slug=slug)
+        return render(request, "single.html", {'post': data})
+    #highlight-end
+    
+```
+  </TabItem>
+</Tabs>
+
+
+:::danger Kodlara Dikkat
+
+Burada blog içindeki views.py içinde Post sınıfını çağırma mantığımız bir tık değişmiş olabilir. Önceden `from . import models` şeklinde çağırırken artık `from .models import Post` olarak çağırmaya başladık. Bunu kod kolaylığı için yaptık. Modülleri takip etmeden kodu direkt kopyalamanız durumunda kodun çalışmama ihtimali yüksektir. Buna dikkat etmeniz gerekir.
+
+:::
+
+
+## Üst Sayfadan Alt Sayfaya Bağlanmak
+
+Her alt sayfa kendine ait has bir slug linkine sahip demiştik. Ancak başka uygulamalardaki iki farklı veri aynı slug verisine sahip olabilir. Bu durumda Django'ya buradaki ayrımı tanıtmamız gerekecek. İşler bir tık karışabilir.
+
+Öncelikle bu kısımda her alt sayfanın slug verisini alt uygulama ve ana proje linki ile birleştirmemiz gerekiyor. Bunun için blog içindeki models.py dosyasında birkaç ekleme yapacağız.
+
+<Tabs>
+  <TabItem value="models2" label="blog/models.py" default>
+
+```python
+
+  def get_absolute_url(self):
+      return reverse("blog:single", args=[self.slug])
+
+```
+  </TabItem>
+  <TabItem value="urls2" label="blog/urls.py">
+
+```python
+
+  #highlight-start
+  app_name = "blog"
+  #highlight-end
+
+  urlpatterns = [
+      path('', views.home, name="index"),
+      path('single/<slug:slug>', views.single, name="single")
+  ]
+    
+```
+  </TabItem>
+  <TabItem value="coreurls" label="core/urls.py">
+
+  ```python 
+  
+  urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('', include('blog.urls', namespace="blog"))
+  ]
+  ```
+
+  </TabItem>
+</Tabs>
+
+
+
+
+Burada öncelikle uygulamamızın (blog) adını kullanarak bir tanımlama yaptık. Buradaki `blog:single` kısmı bizim blog uygulamamızda bulunan urls.py içinde ismi single (`name="single"`) olan veriyi arayacağını ifade etmektedir. 
+
+Core içindeki urls'e blog.urls'e bakacağı zamanın alan adının blog içermesi durumunda olacağını söyledik. Ardından blog içindeki urls'e de uygulamamızın adını `app_name = "blog"` olarak kaydettik
+

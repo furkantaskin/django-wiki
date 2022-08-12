@@ -1,0 +1,73 @@
+---
+sidebar_position: 7
+custom_edit_url: null
+description: "Sınıf içine görsel ekleme ve görsel kullanma metodları"
+---
+
+# Görsel Ekleme
+
+Django bu kısımda aslında bize çok sayıda kolaylık sağlamakta. Görsellerimizi sisteme yüklerken hangi dizine yükleyeceğini ve dizi içindeki veride görsel olmaması durumunda hangi görseli çekeceğini seçebiliriz. Bunun için yapmamız gereken blog içindeki models.py dosyasına ImageField alanını eklemek olacaktır.
+
+```python title="blog/models.py"
+
+from django.db import models
+
+class Post(models.Model):
+    title = models.CharField(max_length=155)
+    content = models.TextField(null=True)
+    slug = models.SlugField(max_length=255)
+    # highlight-start
+    image = models.ImageField(upload_to="images/", default="images/default.png")
+    # highlight-end
+    def __str__(self):
+        return self.title
+```
+
+
+Ardından ana dizine media/images klasörü açarak içine bir default.png dosyası ekleyebiliriz. 
+
+Bu kısımda terminale bakarsak Django bize Pillow modülünün yüklü olmadığı yönünde uyarıda bulunacaktır. [Pillow](https://pypi.org/project/Pillow/), Python'ın görseller üzerinde işlemler yapmasını sağlayan kütphanesidir. Normalde PIL (Python Imaging Library) kütüphanesinden türetilmiştir ve Django görsellerde Pillow üzerinden işlem yapmaktadır. Bunun için basit bir şekilde `pip install Pillow` komutu ile kütüphanemizi kurabiliriz.
+
+Sonrasında yine tek yapmamız gereken makemigrations ve migrate komutları ile Image alanını veri tabanına kaydetmek olacaktır.
+
+Ön yüzde göstermek için template olan html dosyamıza `<img src="{{post.image.url}}>"` şeklinde ekleme yapmamız yeterlidir. Buradaki post.image bizim görselimizi, sonrasına eklenen url ise o dizine giden yolu gösterecektir.
+
+Ancak biz hala Django'ya buradaki dosyamızın nerede tutulduğunu söylemedik. Django bu klasörü ana dizinde arayacaktır, ancak biz bunu media klasörü içine ekledik. Bunu kaydetmemiz için core içindeki urls.py dosyasına dizinimizi tanıtmamız gerekiyor. Buradaki komut biraz kafa karıştırabilir.
+
+
+```python title="core/urls.py" showLineNumbers
+
+from django.contrib import admin
+from django.urls import path, include
+# highlight-start
+from django.conf.urls.static import static
+from django.conf import settings
+# highlight-end
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('', include('blog.urls'))
+]
+# highlight-start
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+# highlight-end
+```
+Peki burada ne yaptık?
+
+Üçüncü ve dördüncü satırdaki modüllerde settings, bize sistemin ayarlarını çekmemide yardımcı oluyor. Aslında buradaki settings, bizim core klasörü içinde bulunan settings verimiz. Burada DEBUG değeri prod ortamında olmadığımız için hala True. Yani henüz geliştirme aşamasındayız. Geliştirme aşamasındaki bir proje ile proddaki bir projenin dizinleri farklı olacağı için burada farklı bir dizini medya dizini olarak kullanıyoruz. Buradaki `MEDIA_URL` ile `MEDIA_ROOT` değişkenler settings.py içinde tanımlı olmadığı için bunları da tanımlayacağız. Buradan core içindeki settings.py içine gidiyoruz ve medya olarak hangi klasörümüzün referans alınacağını gösteriyoruz.
+
+
+```python title="core/settings.py"
+
+MEDIA_URL = "media/"
+MEDIA_ROOT = BASE_DIR / "media"
+
+```
+
+Burada `MEDIA_ROOT` [Django'nun sitesinde de belirtildiği gibi](https://docs.djangoproject.com/en/4.0/ref/settings/#media-root) absolute bir path ister. Yani dosyanın bulunduğu yeri değil, o klasörün diskteki mutlak konumunu ister. Örneğin siz bir linux ortamında geliştirme yapıyorsanız dizinin `/var/www/example.com/media` şeklinde gelmesi gerekir. Django bu kısımda mutlak konumun ilk kademesini `BASE_DIR` içinde tuttuğu için bunu kullanarak media klasörüne daha kolay erişebiliriz. `MEDIA_URL` ise bizim MEDIA_ROOT içinden gelen dizini işlememizi sağlayan değişkendir. Bunu kullanarak sistemin doğru adresten doğru dosyayı çekmesini sağlarız.
+
+:::caution
+
+Model içindeki her değişiklik `makemigrations` ile veri tabanında güncellemeleri yapar. Ancak bu kısımda default kısmı güncellenmeyebilir. Bu kısımda migration esnasında en son doğru çalışan migrasyona geri dönüp düzenlemeleri yeniden yapmak en uygunudur.
+
+:::

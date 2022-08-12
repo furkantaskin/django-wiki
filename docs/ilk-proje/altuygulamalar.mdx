@@ -1,0 +1,81 @@
+---
+sidebar_position: 3
+custom_edit_url: null
+description: "Django içinde yeni uygulama oluşturmak"
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# Alt Uygulamalar
+
+Django, çok sayıda alt uygulamanın birleşiminden bir ana uygulama mantığı ile ilelemektedir. Bundan dolayı projemiz oluşturulduktan sonra bunu alt uygulamalara böleriz. Örneğin core projemizin altına bir blog projesi açmamız gerekiyorsa eğer şu şekilde yaparız: 
+
+```powershell
+
+py manage.py startapp blog
+
+```
+
+Burada ana dizinimizde core ile yan yana bir blog uygulaması oluşturulacaktır. Ancak Django bunun bir uygulama olduğunu anlayamaz ve yönlendirmeleri doğru yapamaz. Bunun için belirli yönlendirmeler yapmak gerekir. Oluşturulan blog klasörü içine bir urls.py dosyası açacağız. Yeni dizinimiz şu şekilde oluşturulacaktır
+
+
+```language-plain
+
+root
+	manage.py
+    blog/
+        __init__.py
+        admin.py
+        apps.py
+        models.py
+        tests.py
+        urls.py
+        views.py
+	core/ 
+		__init__.py
+		settings.py
+		urls.py
+		asgi.py
+		wsgi.py
+    template/
+        home.html
+
+```
+
+Burada artık yönlendirmeyi blog içinden yapacağımız için `core/urls.py` ile `blog/urls.py` içinde düzenleme yapmamız gerekiyor.
+
+
+<Tabs>
+  <TabItem value="core" label="core/urls.py" default>
+
+```python
+
+  from django.contrib import admin
+  from django.urls import path, include
+
+  urlpatterns = [
+      path('admin/', admin.site.urls),
+      path('home/', include('blog.urls'))
+  ]
+
+```
+  </TabItem>
+  <TabItem value="blog" label="blog/urls.py">
+
+```python
+
+  from django.urls import path
+  from django.views.generic import TemplateView
+
+  urlpatterns = [
+      path('', TemplateView.as_view(template_name="home.html"))
+  ]
+
+```
+
+  </TabItem>
+</Tabs>
+
+Özetlemek gerekirse eğer kullanıcı siteye bir istekte bulunursa Django'nun ilk bakacağı şey core içinde bulunan urls.py dosyası olacaktır. Buradan gelen listelere göre kullanıcın isteğine en uygun pattern'ı bulacak ve o adrese kullanıcıyı yönlendirecektir.
+

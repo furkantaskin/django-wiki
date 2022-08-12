@@ -1,0 +1,49 @@
+---
+sidebar_position: 6
+custom_edit_url: null
+description: "Veri tabanındaki verileri ön yüzde dinamik bir şekilde göstermek"
+---
+
+# Verilerin Ön Yüzde Gösterilmesi
+
+Önceki kısımlarda model üzerinden yeni alanlar oluşturup admin panelinden iki blog postu eklemiştik. Artık bunları ön yüze çekebiliriz. Bunun için `blog/views.py` içine gitmemiz yeterlidir.
+
+```python title="blog/views.py"
+
+from django.shortcuts import render
+from .models import Post
+# Create your views here.
+
+
+def home(request):
+    data = Post.objects.all()
+    return render(request, "index.html", {"posts": data})
+
+```
+
+Bu kısımdaki `Post.objects.all()` bize çağırılan Post modelinde kayıtlı olan tüm verileri çekecektir. Bu kısımda gerekirse filtre uygulanabilir. Biz şimdilik bu filtreyi es geçiyoruz.
+
+Burada değiştirmemiz gereken bir kısım var. Hatırlanırsa `blog/urls.py` içinde html dosyamızı `TemplateView.as_view()` olarak tanımlamıştık. Bu kod parçası template içindeki python kodlarını es geçeceği için bunu değiştirmemiz gerekecektir.
+
+```python title="blog/urls.py"
+
+urlpatterns = [
+    # highlight-start
+    path('', views.home, name="index")
+    # highlight-end
+]
+
+```
+Sonrasında tempplate klasörü içindeki home.html dosyamızı index.html olarak değiştirip şu şekilde bir kod kullanıyoruz
+
+```html
+{% for post in posts %}
+    <details>
+        <summary>{{ post.title }}</summary>
+        <p>{{ post.content }}</p>
+    </details>
+{% endfor %}
+
+```
+
+Bu kod tuhaf görünebilir. O yüzden açıklamakta fayda var. Durum blokları Django template içinde {% statement %} şeklinde ve {% endstatement %} şeklinde gelir. Yukarıda for ve endfor şeklinde iki blog açıp içine gereken html bloğunu ekliyoruz. Eğer ekrana bir şey yazmamız gerekiyorsa {{}} şeklinde çift süslü parantez yeterli olacaktır. 

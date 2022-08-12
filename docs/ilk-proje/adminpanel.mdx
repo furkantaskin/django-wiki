@@ -1,0 +1,28 @@
+---
+sidebar_position: 6
+custom_edit_url: null
+description: "Django ile hazır admin panelini kullanmak"
+---
+
+# Admin Paneli
+
+Django kendi içinde bir admin paneli bulundurur. Bu admin paneline erişim için öncelikle bir superuser oluşturmamız gerekir. Bunu yapmak terminal yoluyla çok kolaydır.
+
+```powershell
+py manage.py createsuperuser
+```
+
+Sistem bizden burada isim (boş girilmesi durumunda varsayılan oturum kullanıcı adı), e-posta adresi ve parola isteyecektir. Bunların doldurulması sonrasında superuser oluşturulacaktır.
+
+![Admin paneli](./assets/2-adminpanel.jpg)
+
+Burada blog içindeki veri tabanına erişebilmemiz için blog içinden modelimizi admine kaydetmemiz gerekecektir.
+
+```python title="blog/admin.py"
+    from django.contrib import admin
+    # highlight-start
+    from . import models
+    
+    admin.site.register(models.Post)
+    # highlight-end
+```

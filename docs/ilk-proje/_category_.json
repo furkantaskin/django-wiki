@@ -1,0 +1,8 @@
+{
+    "label": "İlk Proje",
+    "position": 2,
+    "link": {
+        "type": "generated-index",
+        "description": "Django ile ilk projemizi yapalım"
+    }
+}

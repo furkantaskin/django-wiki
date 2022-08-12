@@ -1,0 +1,56 @@
+---
+sidebar_position: 1
+custom_edit_url: null
+descriotion: "Yeni proje başlatmak ve dosyaları tanımak"
+---
+
+# Hello World
+
+İlk proje olarak bir blog uygulaması düşünebiliriz. Burada başta ana projemizi oluşturmamız gerekiyor. Bunun için `pip install Django` ile önce gerekli uygulamamızı kurmamız gerekiyor. 
+
+:::tip 
+
+Dilersek burada bir virtualenv oluşturarak projeden projeye Django sürümümüzü değiştirebiliriz. Bu kısımda `virtualenv venv` ile projemizi oluşturuduktan sonra ` .\venv\Scripts\activate` ile veya burada venv kısmına yazdığımız klasör adı ile virtual environment içine giriş yapabiliriz. Sonrasında `pip install Django` ile Django paketimizi kurabiliriz.
+
+:::
+
+## Proje Başlatma
+
+Django bu kısımda temel bir satırlık kod ile bu işlemi gerçekleştirmektedir.
+
+```powershell
+
+django-admin startproject core .
+
+```
+
+Burada core, bizim proje için gerekli sql ve konfigürasyonun yanı sıra çeşitli temel dosyalarımızın bulunacağı klasör olacaktır. `.` komutu ile core klasörü bir alt dizin yerine ana dizine kurulacaktır. Sonrasında klasör yapımız şu şekilde olacaktır:
+
+```language-plain
+
+root
+	manage.py
+	core/ 
+		__init__.py
+		settings.py
+		urls.py
+		asgi.py
+		wsgi.py
+
+```
+
+Buradaki dosyaları incelemekte fayda var.
+
+- `settings.py`: Projenin yapılandırması bu dosyada gerçekleşir. Proje hakkındaki genel bilgiler burada tutulur
+- `urls.py`: Projenin tıpkı içindekiler mantığında çalışan kısmıdır. Hangi ismin hangi dosyaya gideceği burada belirlenir. 
+- `asgi.py`: ASGI uyumlu sunucular için yapılandırma içerir
+- `wsgi.py` : WSGI uyumlu sunucular için yapılandırma içerir. (İleri kısımlarda nginx ve apache için wsgi.py kullanacağız.)
+
+
+Açılan ilk projeden sonra tek yapmamız gereken projeyi çalıştırmak.
+
+```powershell
+py manage.py runserver
+```
+
+Buradaki proje `DEBUG=True` olarak çalışacağı için karşımıza başarılı çalışma ekranı gelecektir. Bu ekranı görebiliyorsak eğer projemiz doğru çalışıyor demektir.

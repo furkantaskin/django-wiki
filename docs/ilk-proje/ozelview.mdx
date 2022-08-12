@@ -1,0 +1,44 @@
+---
+sidebar_position: 4
+custom_edit_url: null
+description: "View kullanımı ile ilk ön yüz tasarımı oluşturmak"
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# Views Kullanımı
+
+`views.py` MVC yapısında da açıklandığı gibi kullanıcıya özel işlemler yapılmasını ve duruma göre sistemin şekillenmesini sağlayan kısımdır. Burada kendimize özel bir view hazırlayabiliriz.
+
+Öncelikle `blog/urls.py` içinde bir düzenleme yapacağız.
+
+<Tabs>
+  <TabItem value="urls" label="blog/urls.py" default>
+
+```python
+
+    from django.urls import path
+    from django.views.generic import TemplateView
+    from . import views
+
+    urlpatterns = [
+    path('', views.home, name="homepage")
+    ]
+
+```
+  </TabItem>
+  <TabItem value="views" label="blog/views.py">
+
+```python
+
+    from django.urls import path
+    from django.views.generic import TemplateView
+
+    urlpatterns = [
+        path('', TemplateView.as_view(template_name="home.html"))
+    ]
+    
+```
+  </TabItem>
+</Tabs>
