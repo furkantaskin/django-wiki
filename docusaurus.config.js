@@ -27,8 +27,8 @@ module.exports = createConfig;
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
-  title: 'Personal Django Wiki',
-  tagline: 'Created wiki for learning Django and keeping notes',
+  title: 'Personal Wiki',
+  tagline: 'Created wiki for learning new trends and keeping notes',
   url: 'https://github.com',
   baseUrl: '/django-wiki/',
   onBrokenLinks: 'warn',
@@ -72,9 +72,9 @@ const config = {
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
       navbar: {
-        title: 'Personal Django Wiki',
+        title: 'Personal Wiki',
         logo: {
-          alt: 'My Site Logo',
+          alt: 'Furkan Taskin Wiki',
           src: 'https://static.djangoproject.com/img/icon-touch.e4872c4da341.png',
         },
         items: [
@@ -93,7 +93,7 @@ const config = {
       },
       footer: {
         style: 'dark',
-        copyright: `Copyright © ${new Date().getFullYear()} Personal Django, Built with Docusaurus.`,
+        copyright: `Copyright © ${new Date().getFullYear()} Personal Wiki, Built with Lovely Docusaurus.`,
       },
       prism: {
         theme: lightCodeTheme,

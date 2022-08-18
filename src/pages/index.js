@@ -18,7 +18,7 @@ function HomepageHeader() {
           <Link
             className="button button--secondary button--lg"
             to="docs/intro">
-            Kişisel Django Wikisi
+            Kişisel Gelişim Wikisi
           </Link>
         </div>
       </div>
@@ -31,7 +31,7 @@ export default function Home() {
   return (
     <Layout
       title={`Hello from ${siteConfig.title}`}
-      description="A personal wiki to help me on my way while learning Django">
+      description="A personal wiki to help me on my way while learning new languages or any subject related to development">
       <HomepageHeader />
       <main>
         <HomepageFeatures />

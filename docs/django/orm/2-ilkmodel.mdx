@@ -1,0 +1,63 @@
+---
+sidebar_position: 2
+custom_edit_url: null
+description: "İlk modelimizi oluşturalım"
+---
+import Mermaid from '@theme/Mermaid';
+
+
+# Model Oluşturma
+
+Django içindeki modeller aslında veri tabanının framework içindeki gösterimidir. Örnek olarak şöyle bir diyagram düşünebiliriz.
+
+<Mermaid chart={`
+flowchart LR;
+product;
+brand;
+subgraph database;
+product1[product];
+brand1[brand];
+end;
+product-->product1;
+brand-->brand1;
+`}/>
+
+
+
+## Modellerin oluşturulması
+
+Öncelikle `inventory/models.py` içine her bir tablo için bir sınıf açarız. Burada şimdilik product ve brand olarak iki sınıf var
+
+```python title="inventory/models.py" showLineNumbers
+from django.db import models
+
+
+class Product(models.Model):
+    name = models.CharField(max_length=100)
+    qty = models.IntegerField()
+
+
+class Brand(models.Model):
+    name = models.CharField(max_length=100)
+```
+
+Veri tabanımıza (`db.sqlite3`) baktığımızda inventory_brand ve inventory_product olarak iki farklı tablo oluşturulduğunu göreceğiz. Bu tablolarda açtığımız sütunlara ek olarak bir de id sütunu bulunacaktır. Bu varsayılandır ve otomatik olarak eklenir.
+
+Burada sınıflar altına bir string representation açmamız uygun olacaktır. Normal şartlarda sınıfları çağırdığımızda sınıflar çıktı olarak nesnelerin veya sınıfların hafıza adreslerini verir. Bunu, sınıf içine `def __str__(self)` şeklinde bir fonksiyon ekleyerek ve sınıf içindeki nesnelerden birisini return ederek kullanıcı dostu ve daha okunabilir bir forma dönüştürebiliriz. Yani yeni kodumuz şöyle olacaktır:
+
+
+```python title="inventory/models.py" showLineNumbers
+from django.db import models
+
+
+class Product(models.Model):
+    name = models.CharField(max_length=100)
+    qty = models.IntegerField()
+
+    def __str__(self):
+        return self.name
+
+
+class Brand(models.Model):
+    name = models.CharField(max_length=100)
+```

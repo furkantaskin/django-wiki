@@ -1,0 +1,73 @@
+---
+sidebar_position: 1
+custom_edit_url: null
+description: "Yeni bir proje ile ORM'e giriş"
+---
+
+# ORM Üzerine Yeni Bir Proje
+
+Artık Django'nun temelini iyice kavradığımızı ve temel konseptlerini anladığımızı düşünerek kendimizi geliştirebiliriz. Peki sırada ne var? ORM ile kendimizi ilerletmeye başlayabiliriz. 
+
+## ORM Nedir?
+
+Belki birçoğumuz OOP kavramını veya nesne yönelimli programlama terimini duymuşuzdur. Programlamaya ilk girdiğimiz andan itibaren belki çok düşünmesek de ileri dönemlerde kapsamlı bir projede hem sistemin güvenliği hem de kodun geliştirebilirliğini artırabilen OOP, birçok projede olmazsa olmazlardan birisidir. Peki aynı mantığı veri tabanları için de yapamaz mıyız? Tabii ki yaparız. Buradaki her bir sınıfı iyice öğrenerek veri tabanında ilişkili tablolara bağlayabiliriz. SQL kısmında eser miktarda bilgi ve iyi öğrenilmiş OOP ile veri tabanlarından korkmamıza gerek yok.
+
+ORM temelde OOP mantığını güderek sistemler arasında veri değişimi sağlayan tekniktir. Özellikle OOP destekleyen dillerde karşımıza sıkça çıkan ORM'de uzun uzun SQL query'leri kullanmadan raht bir şekilde veri tabanına erişebilir ve veri tabanını kontrol edebiliriz. Yani bir nevi SQL'in nesne yönelimli programlaması gibi çalışabiliriz. [**MDN'de de açıklandığı üzere:**](https://developer.mozilla.org/en-US/docs/Learn/Server-side/First_steps/Web_frameworks#abstract_and_simplify_database_access)
+
+- Kodda çok büyük kapsamlı değişiklik yapmadan veri tabanlarını rahat bir şekilde değiştirebiliriz. Veri tabanlarının karakteristiklerine göre sistemi değiştirmek yerine ikisi arasındaki en uygun ve kısa yolu kullanabiliriz. Bu büyük çapta zaman ve zamana bağlı nakit tasarrufu demektir.
+- Veri tabanındaki verinin kontrolünü rahat bir şekilde sağlayabiliriz. Özellikle günümüzde edge-case dediğimiz ciddi uç istisnai durumlar ve güvenliğin önemli olduğu durumlarda verinin güvenliğini sağlamak büyük önem arz etmektedir. Bundan dolayı verinin doğru veri tabanında doğru bir formda tutulduğundan emin olmamız gerekir. Ayrıca tutulan veri içinde SQL Injection gibi tehlikeli durumlara sebep olacak kodların bulunmadığını ve veri ne gelirse gelsin veri tabanımızın güvende olduğunu bilmemizi sağlar. Hatırlarsak [**Model Kullanımı**](../ilk-proje/newmodel.mdx) sayfamıza oluşturduğumuz modelde temel birkaç kod kullanarak veri tabanında sütun oluşturmuştuk. 
+
+
+```python title="blog/models.py"
+
+from django.db import models
+
+
+class Post(models.Model):
+    title = models.CharField(max_length=155)
+    content = models.TextField()
+    slug = models.SlugField(max_length=255)
+    
+```
+
+Örneğin yukarıdaki kod ile blog_post şeklinde oluşan tabloya üç sütun ekledik ve bu sütunlara title, content ve slug isimlerini verdik. Bu sütunlarda ise hangi tiplerin geleceğini CharField, TextField veya SlugField ile belirledik. 
+
+
+Özetlemek gerekirse ORM, nesne yönelimli programlama tekniğini kullanarak veri tabanını ve verilerimizi güvenli ve rahat bir şekilde kontrol etme imkanı sunan bir tekniktir.
+
+
+## Yeni Uygulamaya giriş
+
+:::info Kaynak
+
+Bu projede Very Academy'nin Django 4.x ORM Course serisi baz alınmıştır. Videolu anlatım için [buraya tıklayabilirsiniz](https://www.youtube.com/watch?v=59y3OeOF5ks&list=PLOLrQ9Pn6cayYycbeBdxHUFrzTqrNE7Pe&index=1)
+
+:::
+
+Artık yeni uygulamamızı önceden öğrendimizi startproject komutu ile başlatıyoruz. Ardından inventory isimli yeni bir alt uygulama açıyoruz. Bilgi tazelemek için yeniden ekliyorum
+
+```powershell
+
+django-admin startproject core .
+
+py manage.py startapp inventory
+
+```
+
+
+Arından yine settings.py içine uygulamamızı kaydediyoruz.
+
+```python title="core/settings.py" showLineNumbers
+INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    # highlight-start
+    'inventory',
+    # highlight-end
+]
+```
+
