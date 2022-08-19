@@ -1,0 +1,115 @@
+---
+sidebar_position: 1
+custom_edit_url: null
+description: "İlk Django uygulamasını yazalım"
+---
+
+import Mermaid from '@theme/Mermaid';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# Basit Bir Anket Projesi
+
+:::tip Kaynak
+
+Buradaki projeyi [Django'nun kendi sitesindeki projeden](https://docs.djangoproject.com/en/4.1/intro/tutorial01/) baz alarak yaptım. Linke tıklayarak sitesinden de devam edebilirsiniz.
+
+:::
+
+
+Önceki aşamada bir kişisel blog uygulaması oluşturmuştuk. Şimdi sırada Django'nun sitesini takip etmeye geldi. İlk baktığımda MVC yapısına uzak olduğum için bazı kısımları anlamakta zorlanıyordum ama çeşitli kaynaklar vasıtası ile bu sorunu giderdim. Artık sırada sitedeki kendi projelerini takip etmeye geldi. 
+
+Öncelikle yine bir proje oluşturuyoruz. Ama burada biraz da kendi yorumlarımızı katacağız. Örnek olarak klasör yapısı biraz değişecek. Django'yu indirip venv ile her şeyi ayarladığımızı düşünerek başlıyorum. 
+
+```language-plain
+
+django-admin startproject core .
+
+```
+
+Normalde Django'nun sitesinde burası mywebsite olarak verilmiş. Ancak dediğim gibi ben biraz kendi yorumumu katmak istiyorum. Burada proje adını core değil de anlamlı olabilecek genel bir proje ismi de yapabilirsiniz.
+
+Sırada uygulamayı oluşturmada. Burada kendimizi geliştirdiğimizi düşünerek şu şekilde bir klasör yapısını kullanabiliriz. Kontrolü daha kolay olacaktır.
+
+
+<Mermaid chart={`
+  flowchart LR;
+project-->project1[project_name];
+project-->apps & template & static & media & venv & requirements;
+apps--> app1 & app2 & app3;
+requirements --> py3.py;
+`}/>
+
+
+
+Sırada uygulamamızı başlatmaya geldi 
+
+```language-plain
+
+django-admin startapp polls
+
+```
+
+Bunun için apps klasörüne gidip bu kodu yazabiliriz. Ben apps klasörüne gitmeyi tercih ettim.
+
+
+:::tip Uygulama ile Proje Arasındaki Farklar
+
+Uygulama, daha doğrusu bir web uygulaması, spesifik bir olaya yönelik hizmetler sunar. Örneğin blog uygulaması ya da hesap uygulaması deriz. Ancak proje dediğimiz şey bu projelerin birleşiminden oluşur. Bir uygulama birden fazla projede yer alabilir ya da bir proje birden fazla uygulama barındırabilir.
+
+:::
+
+Şimdi ilk görüntülememizi yazalım. Öncelikle polls içindeki `views.py` içine gidiyoruz.
+
+```python title="apps/polls/views.py"
+from django.http import HttpResponse
+
+
+def index(request):
+    return HttpResponse("Selamlar")
+
+```
+
+Sonrasında sistemin bunu tanıyabilmesi için polls içine `urls.py` dosyası açıyoruz
+
+
+
+<Tabs>
+  <TabItem value="polls" label="apps/polls/urls.py">
+
+```python 
+from django.urls import path
+from . import views
+
+urlpatterns = [
+  path('', views.index, name="index")
+]
+```
+  
+  </TabItem>
+  <TabItem value="core" label="core/urls.py">
+
+```python 
+from django.contrib import admin
+from django.urls import path, include
+
+
+urlpatterns = [
+  path('admin/', admin.site.urls),
+  path('polls/', include("apps.polls.urls"))
+]
+```
+  
+  </TabItem>
+</Tabs>
+
+
+
+:::warning Önemli
+
+Django kendi içinde varsayılan zaman dilimi olarak UTC saatini alır. Bu bizim ülkemize göre 3 saat geridedir. Türkiye merkezli bir sistem yapıyorsak core içindeki `settings.py` dosyasında ufak bir düzenleme gerekiyor. Aşağıda belirtilen `TIME_ZONE` ifadesini bulup içindeki değeri Asia/Istanbul yapmak yeterlidir.
+
+```python title="core/settings.py"
+TIME_ZONE = 'Asia/Istanbul'
+```
+:::

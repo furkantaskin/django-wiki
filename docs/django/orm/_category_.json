@@ -1,8 +1,8 @@
 {
-    "label": "ORM Mastery",
+    "label": "Örnek Django Projesi",
     "position": 3,
     "link": {
         "type": "generated-index",
-        "description": "Django içinde ORM bilgimizi pekiştirelim"
+        "description": "Django sitesindeki anket uygulamasını anlayalım"
     }
 }

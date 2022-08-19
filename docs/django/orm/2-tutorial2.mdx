@@ -1,0 +1,143 @@
+---
+sidebar_position: 2
+custom_edit_url: null
+description: "Django ile modellere giriş"
+---
+
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# Modellere giriş
+
+[Önceki konumuzda](1-tutorial1.mdx) ilk uygulamamızı ve projemizi oluşturup ekrana ilk çıktımızı vermiştik. Sıra geldi veri tabanı ile iletişime. Django burada MVC temelli yapı kullandığı için gerekli sınıflarımızı oluşturmamız gerekiyor. Bunu uygulamamıza spesifik yapacağız. Yani polls içindeki `models.py` dosyasını düzenleyeceğiz.
+
+
+```python title="apps/polls/models.py"
+from django.db import models
+
+
+class Question(models.Model):
+    question_text = models.CharField(max_length=200)
+    pub_data = models.DateTimeField("date published")
+
+
+class Choice(models.Model):
+    question = models.ForeignKey(Question, on_delete=models.CASCADE)
+    choice_text = models.CharField(max_length=200)
+    votes = models.IntegerField(default=0)
+```
+
+Burada bilmemiz gereken şeyler nelerdir? Django veri tabanı oluştururken değişken isimlerimizi veri tabanında sütun ismi olarak kullanacaktır. Tablo adımız ise `polly_question` veya `polls_choice` olarak gelecektir. Burada `CharField` bizden maksimum uzunluk beklemektedir. `ForeignKey` ise o sınıfın, ilişkilendirildiği sınıfa bağlı olduğunu gösterir. Bir soru yoksa şıkların olmasının bir anlamı yoktur. Yani eğer bir soru siliyorsanız, onunla alakalı seçimleri de silmeniz gerekecektir.
+
+## Uygulamayı Projeye Tanıtma
+
+Şimdi bu kısmı da tamamladıysa sıra uygulamamızı projede tanıtmaya geldi. Bunun için core içindeki settings.py dosyasına gideceğiz. Burada polls içindeki `apps.py` içinde ufak bir düzenleme gerekecek.
+
+
+
+<Tabs>
+  <TabItem value="settings" label="core/settings.py">
+
+```python 
+
+INSTALLED_APPS = [
+    # highlight-start
+    "apps.polls"
+    # highlight-end
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+]
+
+```
+
+  </TabItem>
+
+  <TabItem value="apps" label="apps/polls/apps.py">
+
+```python 
+from django.apps import AppConfig
+
+class PollsConfig(AppConfig):
+    default_auto_field = 'django.db.models.BigAutoField'
+    # highlight-start
+    name = 'apps.polls'
+    # highlight-end
+```
+
+  </TabItem>
+</Tabs>
+
+
+Burada apps.py içinde normalde uygulama adımız polls olarak geliyor. Bunu apps.polls yapmak yeterlidir (başka çözüm varsa da şu an için ben bilmiyorum).
+
+
+Artık uygulamamızı da kaydettiysek modellerimizi migrate edebilirsiniz
+
+```lanugage-plain
+py manage.py makemigrations polls
+py manage.py migrate
+
+```
+
+## Modelde default alan belirleme
+
+
+Burada modelimiz QuerySet içinde geldiğinde pek hoş olmayan bir çıktı verecektir. Bu çıktıyı güzelleştirmek için default return değeri verebiliriz. Bunun için models.py içinde yeni bir güncelleme yapacağız.
+
+
+```python title="apps/polls/models.py"
+from django.db import models
+
+
+class Question(models.Model):
+    question_text = models.CharField(max_length=200)
+    pub_date = models.DateTimeField("date published")
+
+    # highlight-start
+    def __str__(self):
+        return self.question_text
+    # highlight-end
+
+class Choice(models.Model):
+    question = models.ForeignKey(Question, on_delete=models.CASCADE)
+    choice_text = models.CharField(max_length=200)
+    votes = models.IntegerField(default=0)
+
+    # highlight-start
+    def __str__(self):
+        return self.choice_text
+    # highlight-end
+
+```
+
+
+## Admin kullanıcısı oluşturma
+
+Artık modellerimiz belirli ancak burada daha kolay bir veri kontrol paneli olamaz mı? Örneğin bir CMS paneli fena olmaz. İşte Django bu kısımda bize hazır bir admin paneli veriyor. Bu admin paneline `127.0.0.1:8000/admin` ile erişebiliriz. Ancak buraya giriş yapabilmemiz için bize bir admin kullanıcısı lazım. Onu da şu şekilde oluşturuyoruz
+
+```language-plain
+py manage.py createsuperuser
+```
+
+Burada bizden bir admin kullanıcı adı, eposta ve parola isteyecektir. Parolayı iki defa gireceğiz çünkü parola önemlidir. Eğer bilgiler doğruysa user oluşturulacaktır.
+
+
+## Admin paneline model bağlama
+
+Admin paneline girdiğimizde Question veya Choice alanı olmayacak. Bunları bizim panele kaydetmemiz gerekiyor. Bunun için proje içindeki admin.py dosyasına gitmemiz lazım. 
+
+```python title="apps/polls/admin.py" 
+from django.contrib import admin
+from .models import Question, Choice
+
+# highlight-start
+pollsModels = [Question, Choice]
+
+admin.site.register(pollsModels)
+# highlight-end
+```
