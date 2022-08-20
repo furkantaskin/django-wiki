@@ -1,0 +1,210 @@
+---
+sidebar_position: 4
+custom_edit_url: null
+description: "Django ile form oluşturma"
+---
+
+# Form Oluşturma
+
+Django içinde tüm sorularımız güzel bir şekilde dinamik bir yapıda listeledik. Peki bunlara nasıl oy vereceğiz? Yani sistem neye oy verdiğimizi ve bunları arka planada nasıl tutacak? İşte bu bölümde bunu inceleyeceğiz.
+
+## Örnek Form
+
+Öncelikle detail.html içinde biz normalde soruya ait seçeneklerimiz listeliyorduk ancak herhangi bir işlem yapamıyorduk. Artık bu kısmı biraz değiştirip güzel bir form ekleyebiliriz. Öncelikle detail.html dosyasını elden geçiriyoruz.
+
+```html title="apps/polls/templates/detail.html"
+<form action="{% url 'polls:vote' question.id %}" method="post">
+{% csrf_token %}
+<fieldset>
+    <legend><h1>{{ question.question_text }}</h1></legend>
+    {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+    {% for choice in question.choices.all %}
+        <input type="radio" name="choice" id="choice{{ forloop.counter }}" value="{{ choice.id }}">
+        <label for="choice{{ forloop.counter }}">{{ choice.choice_text }}</label><br>
+    {% endfor %}
+</fieldset>
+<input type="submit" value="Vote">
+</form>
+```
+
+
+Burada action veya method gibi attribute kısımlarının ne işe yaradığını [MDN üzerinden inceleyerek](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/form) öğrenebiliriz.
+
+:::tip İpucu
+
+Bu kısımdaki etiketler veya attributeler kafanızı karıştırıyorsa frontend bilginizi gözden geçirmenizde fayda var. Bunun için [roadmap.sh](https://roadmap.sh) adresini inceleyebilirsiniz ve backend kısımlarını öğrenebilirsiniz.
+
+:::
+
+Kodumuzu incelersek action kısmında polls:vote ibaresi var. Bu demek oluyor ki urls içinde vote pathi bizi bir yerlere götürüyor. Normalde buradaki vote bizi views.py içindeki vote fonksiyonuna atıyordu ve biz orada sadece bir metni yazdırıyorduk. Ancak bunu bir miktar değiştireceğiz. Buradaki csrf_token kavramı kafa karıştırabiliriz. Bunu [Django'nun sitesinden](https://docs.djangoproject.com/en/4.1/ref/csrf/) incelemekte fayda var.
+
+:::info HATIRLATMA
+
+Burada ben models.py içinde Choice için bir [related tanımlamıştım](3-tutorial3.mdx#template-ve-multiclass). Bu related üzerinden değişiklik yaparak gideceğim. Eğer siz yapmadıysanız kod içinde choices yazan yerleri choice_set olarak değiştirebilirsiniz.
+
+:::
+
+`forloop.counter` nereden geldi diyebilirsiniz. Bunu aslında bize Django veriyor. forloop.counter sayesinde 1 ile başlayan bir döngü indexi tanımlıyoruz. Detaylı bilgi için [Django'nun sitesini](https://docs.djangoproject.com/en/4.1/ref/templates/builtins/#for) ziyaret edebilirsiniz.
+
+Ardından her bir input değerini seçeneklerden alıyoruz. Burada choice değerleri question'a bağlı olduğu için ayrı bir tanımlamaya gerek yok. Related olarak hepsi gelecektir.
+
+
+Sırada formumuzun işlemlerini düzenlemede. Ön yüz her ne kadar olsa da bunu arka tarafta veri tabanına göndermemiz ve modellerimiz güncellememiz gerekecek. Hatırlarsak views için kullanıcıdan gelen isteğe göre sayfada özelleştirmeler yapan bir yapı demiştik. İşte bunu bu kısımda daha iyi anlayacağız. Öncelikle views.py içindeki vote fonksiyonumuzu "**birazcık**" değiştiriyoruz. 
+
+```python title="apps/polls/views.py"
+# highlight-start
+from django.http import HttpResponse, HttpResponseRedirect
+from django.shortcuts import render, get_object_or_404
+from django.urls import reverse
+from .models import Question, Choice
+# highlight-end
+
+def index(request):
+    latest_question_list = Question.objects.order_by('-pub_date')
+    context = {'latest_question_list': latest_question_list}
+    return render(request, 'index.html', context)
+
+
+def detail(request, quest_id):
+    question = get_object_or_404(Question, pk=quest_id)
+    return render(request, 'detail.html', {'question': question})
+
+
+def result(request, quest_id):
+    return HttpResponse("You're looking at the results of %s question" % quest_id)
+
+# highlight-start
+def vote(request, quest_id):
+    question = get_object_or_404(Question, pk=quest_id)
+    try:
+        selected_choice = question.choices.get(pk=request.POST['choice'])
+    except (KeyError, Choice.DoesNotExist):
+        # Redisplay the question voting form.
+        return render(request, 'detail.html', {
+            'question': question,
+            'error_message': "You didn't select a choice.",
+        })
+    else:
+        selected_choice.votes += 1
+        selected_choice.save()
+        # Always return an HttpResponseRedirect after successfully dealing
+        # with POST data. This prevents data from being posted twice if a
+        # user hits the Back button.
+        return HttpResponseRedirect(reverse('polls:result', args=(question.id,)))
+# highlight-end
+```
+
+Kodumu uzun gelse de aslında çok bir işlem yok. Öncelikle bazı kütüphaneler ekledik, bunları zaten içeride kullandıkça anlatacağız. Sonrasında bizim seçilen cevabımızın nereden geleceğini göstermek için o cevabın tanımlı olduğu sorudaki cevaplara bakıyoruz. Ve diyoruz ki kullanıcının post ettiği veri bizim sorumuzda bulunan cevaplar içinden geliyor. Eğer burada bir hatamız varsa (örneğin cevap seçmeden gönder demek gibi) o zaman kullanıcımıza bir hata var burada, sen bir seçim yapmadın diyoruz. question tanımlamasını zaten detail içinde de yaptığımız için template içinde kullanacağımız biliyoruz. Burada gördüğümü iki farklı satır var. Birincisi `selected_choice.save()` ve ikincisi `return HttpResponseRedirect(reverse('polls:results', args=question.id))` satırı. Burada .save() kısmı veriyi veri tabanına kaydederken return kısmı ise kulanıcınn birden fazla oy kullanmasını önlemek için bizi belirlediğimiz bir sayfaya yönlendiriyor. Biz burada gidilecek sayfa olarak results sayfasını seçtik. Results sayfasını ise views içindeki result fonksiyonuyla kontrol ediyorduk. Artık kullanıcımız oy kullandığı için onu sonuçlar sayfasına iletebiliriz. Bunun için result fonksiyonunu da biraz değiştireceğiz. 
+
+
+```python 
+def result(request, quest_id):
+    question = get_object_or_404(Question, pk=quest_id)
+    return render(request, 'results.html', {'question': question})
+```
+
+Ardından templates klasörümüze bir de results.html dosyası oluşturacağız. Burada sorumuzun altına cevaplarımızı gösterip hangisinin kaç oy aldığını göstermemiz lazım. Bunun için html dosyasına bir ekleme yapıyoruz.
+
+```html title="apps/polls/templates/results.html" 
+<h1>{{ question.question_text }}</h1>
+
+<ul>
+{% for choice in question.choices.all %}
+    <li>{{ choice.choice_text }} -- {{ choice.votes }} vote{{ choice.votes|pluralize }}</li>
+{% endfor %}
+</ul>
+
+<a href="{% url 'polls:detail' question.id %}">Vote again?</a>
+```
+
+Buradaki pluralize olayının ne olduğunu sorabilirsiniz. Buradaki amaç değerin 1'den büyük olması durumunda (vote bu durumda votes olacaktır) ne yapmamız gerektiğini belirtir. Django normalde pluralize durumunda metnin sonuna s takısı atar ancak siz bunu özelleştirebilirsiniz. Detaylı bilgi için [Django'nun sitesini ziyaret edebilirsiniz.](https://docs.djangoproject.com/en/4.1/ref/templates/builtins/#pluralize)
+
+Burada aslında çok bir şey anlatmaya grek yok. Yapılan işlemler kodu okuyunca anlaşılabiliyor.Artık sorudaki her bir seçeneği işaretledikçe modelimiz buna göre güncellemeler yapacak ve bu da views içinde gerekli güncellemeleri yapacaktır.
+
+:::note KİŞİSEL NOT
+
+Burada ilgimi çeken tek kısım şu oldu: Eğer yönetim paneline başka bir soru için bir daha Feels great seçeneği eklediğimizde listelemede iki tane Feels great görünüyor. Bu biraz kafa karıştırabilir mi diye düşünmedim değil
+
+:::
+
+
+## Generic Yapı
+
+İşin aslında bir tık karışık kısmına geliyoruz. Normalde views içinde her şeyi birer fonksiyon ile halledip sonucu render ediyorduk. Ancaj Django, felsefesi içerisinde KISS (Keep it simple stupid) mantığı gütmekte. Bunu daha medeni söyleyecek olursak "less code is better" diyebiliriz. Peki bu nasıl olacak? Yani elimizdeki kod zaten kısa değil mi? Her fonksiyon en fazla iki satır alıyor. Evet kısa ancak işlevsellik de önemli. Bunu da Django "generic" dediğimiz yapı ile sağlıyor. Aslında kodumuz kısa olsa da urls.py içinde kontrol yeri gelince zorlaşabilir. Bunun önüne geçebiliriz. Peki nasıl? 
+
+
+```python title="apps/polls/urls.py"
+from django.urls import path
+from . import views
+
+app_name = 'polls'
+# highlight-start
+urlpatterns = [
+    path('', views.IndexView.as_view(), name='index'),
+    path('<int:pk>/', views.DetailView.as_view(), name='detail'),
+    path('<int:pk>/results/', views.ResultsView.as_view(), name='result'),
+    path('<int:quest_id>/vote/', views.vote, name='vote'),
+]
+# highlight-end
+```
+
+Farkındaysaanız geni birkaç yapı geldi. Artık quest_id şeklinde url içinde sorgulama yapmıyoruz. Tek yapıtğımız sorunun kendi id'sini göndermek (buradaki pk Primary Key anlamına geliyor. Bu da bizim id değerimize eşit). Sırada views.py içinde güncelleme yapma vakti.
+
+```python title="apps/polls/views.py"
+from django.http import HttpResponseRedirect
+from django.shortcuts import get_object_or_404, render
+from django.urls import reverse
+# highlight-start
+from django.views import generic
+
+from .models import Choice, Question
+
+
+class IndexView(generic.ListView):
+    template_name = 'polls/index.html'
+    context_object_name = 'latest_question_list'
+
+    def get_queryset(self):
+        """Return the last five published questions."""
+        return Question.objects.order_by('-pub_date')[:5]
+
+
+class DetailView(generic.DetailView):
+    model = Question
+    template_name = 'polls/detail.html'
+
+
+class ResultsView(generic.DetailView):
+    model = Question
+    template_name = 'polls/results.html'
+# highlight-end
+
+def vote(request, quest_id):
+    question = get_object_or_404(Question, pk=quest_id)
+    try:
+        selected_choice = question.choices.get(pk=request.POST['choice'])
+    except (KeyError, Choice.DoesNotExist):
+        # Redisplay the question voting form.
+        return render(request, 'detail.html', {
+            'question': question,
+            'error_message': "You didn't select a choice.",
+        })
+    else:
+        selected_choice.votes += 1
+        selected_choice.save()
+        # Always return an HttpResponseRedirect after successfully dealing
+        # with POST data. This prevents data from being posted twice if a
+        # user hits the Back button.
+        return HttpResponseRedirect(reverse('polls:result', args=(question.id,)))
+
+```
+
+
+Peki asıl eğlence views içinde dönüyor. Neler oldu burada böyle? 
+
+1. Öncelikle bir generic view yapısını class ile oluşturduk. Farkındaysanız üç sınıf için iki farklı genericview var elimizde. Birisi DetailView, diğeri ise ListView. Bunlar ne işe yarıyor peki?
+    1. Buradaki DetailView: Tekil bir nesne göstermek için kullanılıyor
+    2. Buradaki ListView: Nesnelerden oluşan bir listeyi görüntülemek için ideal. (Kendime not: generic view kısmını iyi anla)
+2. Sonrasında her view için hangi modeli baz aldıysak ve bu modeli hangi template içinde gösteriyorsak bunları `model` ve `template_name` içinde belirttik. render, return ve diğer kısımları farkındaysanız Django kendisi halletti.
+3. ListView için elimzdeki nesne listesinin geleceği listeye bir ad verdik. Bunu `context_object_name` ile yaptık. Önceden render içinde üçüncü parametrede `{'latest_question_list': latest_question_list}` olarak yaptığımız şeyi artık context_object_name olarak gönderdik.
+4. Django'nun geri kalan her şeyi ayarlamasının keyfini çıkardık. 

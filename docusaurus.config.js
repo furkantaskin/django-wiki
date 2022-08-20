@@ -31,8 +31,8 @@ const config = {
   tagline: 'Created wiki for learning new trends and keeping notes',
   url: 'https://github.com',
   baseUrl: '/django-wiki/',
-  onBrokenLinks: 'warn',
-  onBrokenMarkdownLinks: 'warn',
+  onBrokenLinks: 'throw',
+  onBrokenMarkdownLinks: 'throw',
   favicon: 'https://static.djangoproject.com/img/icon-touch.e4872c4da341.png',
 
   // GitHub pages deployment config.

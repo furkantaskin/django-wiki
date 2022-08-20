@@ -1,0 +1,242 @@
+---
+sidebar_position: 3
+custom_edit_url: null
+description: "Django'da view yapısı"
+---
+
+# Django ile View Yapısı
+
+View, belirli bir görevi üstlenen ve template mantığı ile ilerleyen bir Django yapısıdır. Sadece Django için değil ayrıca bir MVC yapısıdır. Örnek bir blog uygulamasında ana sayfa, arşivler (yıllık veya aylık), blog detay sayfasının yanı sıra yorumlar gibi sayfalar bulunur. Bunların içerik kısmını view üzerinden kontrol ederiz. Örneğimizdeki anket uygulamasında ise sorular, soruların cevaplama sayfası, soruların sonuçlar sayfası ve cevaplama işlemi olmak üzere dört farklı durum vardır. Şimdi bunun ön kısımdaki gösterimi ile ilgileneceğiz.
+
+
+## View oluşturma
+
+Polls içindeki `views.py` dosyasına gidip fonksiyonlarımızı ekleyerek başlıyoruz. Hatırlarsak önceki kısımda 4 farklı olaydan bahsetmiştik. Buradaki oylama, sonuçlar ve sorular durumları için birer fonksiyonla çalışacağız. Önceki kodumuza dokunmadan aşağıdaki fonksiyonları ekleyebiliriz.
+
+
+```python title="apps/polls/views.py" 
+def detail(request, quest_id):
+    return HttpResponse("You're looking at question %s." % quest_id)
+
+def results(request, quest_id):
+    response = "You're looking at the results of question %s."
+    return HttpResponse(response % quest_id)
+
+def vote(request, quest_id):
+    return HttpResponse("You're voting on question %s." % quest_id)
+```
+
+
+## Urls içinde Views'a Yönlendirme
+
+Sırada bu fonksiyonları urls içine kaydetmesi var. Burada birkaç kısmı anlamayabilirsiniz.
+
+
+```python title="apps/polls/urls.py"
+    path('<int:question_id>/', views.detail, name="detail"),
+    path('<int:question_id>/result', views.result, name="result"),
+    path('<int:question_id>/vote', views.vote, name="vote")
+```
+
+Burada ne yaptık? Urls içindeki path içinde url içinde sistem bir parçalama yapar. Öncelikle ana domainimiz ("127.0.0.1:8000"), sonrasında uygulama dizinimiz ("polls") ve sonrasında ise -buradaki mantık için- sorumuzun linki bulunur. Django burada son kısımdaki veriyi okuyacaktır. Örneğin linkimiz 127.0.0.1:8000/polls/1 şeklinde gelirse Django, 1'i buradaki `<int:question_id>` içinde değerlendirecektir. Bu kısımla alakalı detaylı bilgiyi [Django'nun sitesinden](https://docs.djangoproject.com/en/4.1/topics/http/urls/) alabilirsiniz.
+
+:::warning DİKKAT
+
+Buradaki `question_id` dediğimiz parametre ile `views.py` içindeki argüman aynı olmalıdır.
+
+::: 
+
+
+Artık Django buradaki gelen URL parametrelerine göre en uygun fonksiyonu çağıracaktır. Views özünde iki olaydan sorumludur. Kullanıcıdan gelen isteğe göre özel bir cevap üretmek veya 404 döndürmek. Geri kalan tasarımsal işlemler geliştiricinin hayal gücüne kalmış bir olaydır.
+
+
+Şimdi index içinde sorularımızı listeletelim. Böylecek kullanıcı polls içine girince direkt olarak soruları görebilirir.
+
+
+```python title="apps/polls/views.py" 
+# Burada sadece highlight edilen kısmı değiştirdik. Diğerleri yine aynı 
+
+from django.http import HttpResponse
+# highlight-start
+from .models import Question
+
+
+def index(request):
+    latest_question_list = Question.objects.order_by('-pub_date'[:5])
+    output = ", ".join([q.question_text for q in latest_question_list])
+    return HttpResponse(output)
+# highlight-end
+
+def detail(request, quest_id):
+    return HttpResponse("You're in detail page for %s question" % quest_id)
+
+
+def result(request, quest_id):
+    return HttpResponse("You're looking at the results of %s question" % quest_id)
+
+
+def vote(request, quest_id):
+    return HttpResponse("You're voting for %s question" % quest_id)
+
+```
+
+:::tip BİLGİ
+
+Buradaki `objects` metodu için [Django'nun sitesindeki QuerySet API sayfasını](https://docs.djangoproject.com/en/4.1/ref/models/querysets/#queryset-api) inceleyebilirsiniz. `pub_date` başındaki eksi işareti descending (azalan) sıra ile sıralama yapacağını göstermektedir. Geri kalan kısım klasik Python liste mantığında çalışmaktadır. 
+
+:::
+
+
+## Template oluşturma
+
+Buradaki tüm kodlarımızı views içinde yaptık ama bir sorun var. Sitemizin HTML/CSS ile hazırlanan bir ön yüzü varken bu dinamik içeriği içeriye nasıl ekleyeceğiz? İşte bu kısımda template sistemini kullanacağız. Şimdi Polls uygulaması içine template klasörü açıp içine bir index.html dosyası ekliyoruz.
+
+
+```html title="apps/polls/templates/index.html"
+
+{% if latest_question_list %}
+    <ul>
+    {% for question in latest_question_list %}
+        <li><a href="/polls/{{ question.id }}/">{{ question.question_text }}</a></li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No polls are available.</p>
+{% endif %}
+
+```
+
+
+Burada latest_question_list varsa eğer ul listelemesi yapılacaktır. Eğer liste boşsa herhangi bir soru olmadığını söyleyeceğiz. Peki buradaki latest_question_list terimini Django nasıl bilecek? Bunu views.py içinde yapacağız. index fonksiyonumuza ufak bir ekleme gerekiyor
+
+
+```python title="apps/polls/views.py"
+from django.http import HttpResponse
+from .models import Question
+# highlight-start
+from django.shortcuts import render
+
+
+def index(request):
+    latest_question_list = Question.objects.order_by('-pub_date')
+    context = {'latest_question_list': latest_question_list}
+    return render(request, 'index.html', context)
+# highlight-end
+
+def detail(request, quest_id):
+    return HttpResponse("You're in detail page for %s question" % quest_id)
+
+
+def result(request, quest_id):
+    return HttpResponse("You're looking at the results of %s question" % quest_id)
+
+
+def vote(request, quest_id):
+    return HttpResponse("You're voting for %s question" % quest_id)
+```
+
+Artık template içindeki latest_question_list teriminin Django hangi listeye ya da yapıya ait olduğunu bilecektir. Sırada bunu ekrana basması var. Burada dilersek context şeklinde bir değişken tanımlamadan direkt olarak `return render(request, 'index.html', {latest_question_list}: latest_question_list` şeklinde de yapabiliriz. Burası tamamen size kalmış bir olay.
+
+
+## 404 Hataları
+
+Peki elimizde bir soru yoksa o soruya ait sayfaya gidince ne yapacağız? İşte bunun için bir try catch metodu gerekecektir. Soruların detay sayfası için bir düzenleme yapacağız. Öncelikle templates klasörüne (index.html dosyasının olduğu dizine) detail.html dosyası oluşturun ve içine sadece `{{question}}` ifadesini ekleyin. Sonrasında views içindeki detail fonksiyonunda ise şöyle bir düzenleme yapın.
+
+```python title="apps/polls/views.py" 
+def detail(request, quest_id):
+    try:
+        question = Question.objects.get(pk=quest_id)
+    except Question.DoesNotExist:
+        raise Http404("There is no question, 404 Error")
+    return render(request, 'detail.html', {'question': question})
+```
+
+:::danger Hatırlatma
+
+Burada beşinci satırdaki `Http404` kısmı hata verecektir. Bunun için HttpResponse metodunu eklediğimiz import satırını `from django.http import HttpResponse, Http404` olarak güncelleyin.
+
+:::
+
+
+Burada try except ile kod kalabalığı oluşuyor olabilir. Bunu daha kolay bir şekilde de halledebiliriz. Dilerseniz tüm fonksiyonu şu şekilde de yapabiliriz:
+
+
+```python 
+def detail(request, quest_id):
+    question = get_object_or_404(Question, pk=quest_id)
+    return render(request, 'detail.html', {'question': question})
+```
+
+:::danger Hatırlatma
+
+Aynı şekilde buradaki `get_object_or_404` kısmını çalıştırabilmek için render metodunu import ettiğimiz satırı `from django.shortcuts import render, get_object_or_404` olarak güncelleyin.
+
+:::
+
+
+## Template İçinde İki Farklı Sınıf Kullanma {template-ve-multiclass}
+
+Normalde bizim Question ve Choice olarak iki sınıfımız vardı. Bunları çok güzel bir şekilde kullandık ama bir sorun var. Sorunun sayfasında o soruya ait seçimleri göstermemiz gerekiyor. Bunu nasıl yapacağız? İşte bu kısım da çok basit. Öncelikle detail.html dosyasını şu şekilde düzenliyoruz.
+
+```html title="apps/polls/templates/detail.html"
+<h1>{{ question.question_text }}</h1>
+<ul>
+{% for choice in question.choice_set.all %}
+    <li>{{ choice.choice_text }}</li>
+{% endfor %}
+</ul>
+```
+
+::tip UFAK BİR DEĞİŞİKLİK
+
+Burada `question.choice_set.all` kısmında choice_set ifadesi nereden geliyor bilmiyor olabiliriz. Bunu Django `sınıfismi_set` olarak alır. Burada kafa karıştırabileceğini düşünüyorsanız model içinde ufak bir düzenleme yapabilirsiniz. Choice sınıfı içindeki şu satırı düzenliyoruz
+
+```python title="apps/polls/models.py"
+question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name="choices")
+```
+
+ForeginKey kısmına related argümanı ekleyerek bunu dilediğiniz bir string yapabilirsiniz. Sonrasında details.html içinde bunu artık question.choice_set yerine question.choices olarak çağırabilirsiniz. Bu kısma dair detaylı açıklama [Stackoverflow üzerinde](https://stackoverflow.com/questions/2048777/what-is-choice-set-in-this-django-app-tutorial/2048806#2048806) mevcuttur.
+
+:::
+
+## URL Düzenlemeleri
+
+Şu ana kadar her şey çok güzel çalışıyor. Peki URL'ler nasıl olacak? Yani anketler sayfasındaki anketlere tıklamak istediğimizde bu linkleri nasıl dinamik yapacağız. Django bu soruun büyük bir kısmını urls.py içinde kendi başına hallediyor. Bizim yapmamız gereken şey sadece birkaç ufak dokunuş. Öncelikle index.html içinde şöyle bir satır düzenlemesi yapıyoruz.
+
+```html title="apps/polls/templates/index.html"
+{% if latest_question_list %}
+    <ul>
+    {% for question in latest_question_list %}
+    <!-- highlight-start    -->
+        <li><a href="{% url 'detail' question.id %}">{{ question.question_text }}</a></li>
+    <!-- highlight-end    -->
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No polls are available.</p>
+{% endif %}
+```
+Normalde bu satırdaki link `/polls/{{ question.id }}/` şeklinde geliyordu. Uygulama adımız polls yerine başka bir şey olsaydı bu durumda hata alabilirdik. Bundan dolayı linkleri mümkün olduğunca dinamik yapmakta fayda var. Index.html dosyası polls içine kaydedildiği için burada polls içindeki urls.py neyin nereye gideceğini biliyor. Buradaki detail kısmına PyCharm üzerinde tıkladığınızda (Ben PyCharm kullanıyorum, VSC de destekliyor olabilir) bizi urls.py içinde name="detail" olan path tanımlamasına götürdüğünü fark edeceksiniz. Dediğim gibi Django bize mümkün olduğunca yardımcı oluyor. 
+
+Örneğin polls içinde specifics şeklinde ya da archive şeklinde bir alt sayfaya daha yönlendirecekseniz, url içindeki `<int:quest_id>` tanımlamasının başına archive eklemesi yapabilirsiniz. Yani yeni yapımız `archive/<int:quest_id>/` olur. Bu durumda linkimiz artık 127.0.0.1:8000/polls/archive/1/ şeklinde oluşacaktır. Buradaki 1 ibaresi sorumuzun id'si olacaktır.
+
+
+## Namespace Mantığı
+
+Peki namespace mantığında neler var? Öncelikle farkındaysak biz sadece bir uygulama oluşturduk. Peki birden fazla uygulama olursa ne yapacağız? İşte bunun için namespace özelliğimiz var. Bunu kullanma sebebimiz index.html içindeki url kısmının hangi uygulamadan geleceğini belirlemede kullanılıyor. Sadece burası değil, dinamik url için gereken en büyük faktör aslında namespace içinde dönüyor. Burada basitçe urls.py içinde gidip urlpatterns'tan önce `app_name = 'polls'` veya uygulama adınız neyse ona göre tanımlama yapmak. Artık index.html içinde hangi uygulamadan hangi linki çekeceğimiz belirleyebiliriz. Yani index.html içinde link satırını tekrar elden geçireceğiz.
+
+```html title="apps/polls/templates/index.html"
+{% if latest_question_list %}
+    <ul>
+    {% for question in latest_question_list %}
+    <!-- highlight-start    -->
+        <li><a href="{% url 'blog:detail' question.id %}">{{ question.question_text }}</a></li>
+    <!-- highlight-end    -->
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No polls are available.</p>
+{% endif %}
+```
+
+Artık sistemimiz, linkin bize blog içindeki detail pathini baz alacağını söyleyebilir.
