@@ -1,0 +1,87 @@
+---
+sidebar_position: 1
+custom_edit_url: null
+description: "İleri seviye Git komutlarına bakıyoruz"
+---
+
+import Mermaid from '@theme/Mermaid';
+
+# İleri Seviye Git
+
+Burada Git içerisindeki temel komutları öğreniyoruz. 
+
+Temel komutlarımızı yazmada fayda var
+
+- `git init` ile local repomuzu oluştururuz.
+- `git add` ile eklenecek dosyaları işaretleriz. Burada `git add .` demek tüm dosyaları ekleyecektir.
+- `git status` ile dosyaların durumuna bakarız. Bu komut bize değişiklikleri veya hazırdaki commitleri mesajları ile gösterir.
+- `git commit -m "Mesaj"` ile commitimizi göndeririz.
+- `git log` ile geçmiş commitlerimizi görebiliriz.
+- `git commit --amend` ile dosyadaki değişikliği son commite yeniden yazabilir ve bir daha commit atmayı engelleyebiliriz.
+- `git commit --amend -m "Yeni mesaj"` ile son committeki açıklamayı güncelleyebiliriz.
+- `git reset --hard commitid` ile verilen commit ID'ye kadar olan tüm commitleri temizler. Ancak pek kullanılması önerilmez (commit ID'nin ilk 7 basamağının olması yeterlidir).
+- `git revert commitid` ile verilen commit ID’ye göre o committeki değişiklikleri iptal ederiz.
+- `git diff commitid..commitid filename` iki commit ID arasında filename isimli dosyada ne değişiklikler olduğunu görebilliriz.
+- `git branch` mevcut branchleri görebiliriz.
+- `git branch name` ile name isimli yeni bir branhc açarız ancak sistem bu branch'i kullanmaz.
+- `git checkout name` ile name isimli branch'a geçiş yapmış oluruz.
+
+:::caution HATIRLATMA
+
+master branch'i düzenlemelerin olacağı bir branch olmamalıdır. Buradaki veriler mümkün olduğunca final halde olmalıdır.
+
+:::
+
+- `git checkout -b name` ile name isimli branch açıp bu brancha direkt geçiş yapabiliriz.
+- `git branch -D name` ile name isimli branch'i sileriz.
+ 
+:::info BİLGİ
+
+Eğer herhangi bir branch içinde (master da dahil) bulunurken yeni bir branch açarsanız, önceki branch referans alınır ve dosyaları da aktarılır. Ancak yeni branch içinde yeni dosya açıp önceki branch'e geçerseniz yeni branch içindeki dosyalar görünmeyecektir.
+
+:::
+
+Bu bilgiyi şöyle şekillendirebiliriz
+
+
+<Mermaid chart={`
+flowchart TB;
+subgraph master;
+intro[intro.md];
+end;
+subgraph first[first branch];
+intro2[intro.md];
+firstmd[first.md];
+end;
+subgraph second[second branch];
+intro3[intro.md];
+firstmd2[first.md];
+seconmd[second.md];
+end;
+master-->first-->second;
+intro-->intro2-->intro3;
+firstmd-->firstmd2;
+`}/>
+
+Burada intro dosyası master'dan first branch içine oradan da second branch içine geçirildi. Ancak first.md first branch içinde açıldığı için master içinde mevcut olmayacaktır.
+
+
+
+- `git stash` ile commit atmak istemediğimiz ama bir süre sonra düzenleyebileceğimiz kısımları yedekleyebliriz.
+- `git stash list` ile listelenen dosyaları görebiliriz
+- `git stash clear` ile listelenen dosyaları silebiliriz
+- `git stash pop` ile en son bulunan stash kaydını geri getirebiliriz
+- `git stash apply stash@{0}` ile stash@ kısmındaki spesifik bir elemandaki durumu geri getirebiliriz.
+
+:::tip YARDIM
+
+Burada Powershell tipi terminaller kullanımda hata verebilir. Bunun için `git stash apply 'stash@{0}'` şeklinde tırnak içine alarak yazabilirsiniz.
+
+:::
+
+
+:::info BİLGİLENDİRME
+
+`git stash pop` ile son eleman gelir ve stash listesinden kalkar ancak `git stash apply` ile eklenen stash verisi direkt olarak sistemden silinmez. Stash içinde varlığını sürdürmeye devam eder.
+
+:::

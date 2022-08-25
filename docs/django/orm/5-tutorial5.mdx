@@ -1,0 +1,46 @@
+---
+sidebar_position: 5
+custom_edit_url: null
+description: "Django ile statik dosya çektirme"
+---
+
+# Statik Dosyalar
+
+Önceki kısımlarımızda başarılı bir şekilde listeleme ve çeşitli form işlemleri yaptık. Ancak bizim tasarımımızın bazı görsel dekorasyona ihtiyacı olacak. Bunları biz ön yüzde HTML, CSS ve JS ile yapıyoruz. Peki bunların ön yüze çekilmesi için neler yapmamız gerekiyor?
+
+
+## Dekorasyon
+
+Öncelikle uygulamamız olan polls klasörü içine bir static klasörü açıp içine basitçe bir css dosyası ekleyeceğiz. 
+
+:::caution önemli
+
+Ben bu kısımda CSS için Sass kullanıyorum. Normal CSS kullanmak isterseniz kullanabilirsiniz.
+
+:::
+
+Öncelikle `index.html` içindeki listemizi güzelleştirmek için static içinde CSS klasörü oluşturup burada bir dosya açıp listemizin renkleri ve font büyüklüklerini özelleştiriyoruz.
+
+
+```scss title="apps/polls/static/polls/css/style.scss" 
+.questionList{
+  li{
+    font-size: 20px;
+    color: red;
+  }
+}
+```
+
+Sırada bunu index.html içine çektiriyoruz.
+
+```html title="apps/polls/templates/index.html"
+{% load static %}
+
+<link rel="stylesheet" href="{% static 'polls/css/style.css' %}">
+```
+
+
+index.html dosyasına karşılık gelen sayfamıza gittiğimizde css dosyasının çalıştığını görebiliriz. 
+
+
+Artık başarılı bir şekilde temel Django kullanarak arka planda CRUD işlemi yapabilir ve ön tarafta bunu gösterebiliriz. Yeni şeyler öğrendikçe buralara ekleyeceğim. Şimdiden iyi çalışmalar.

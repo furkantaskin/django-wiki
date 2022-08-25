@@ -1,0 +1,8 @@
+{
+    "label": "Patika Yol Haritası",
+    "position": 5,
+    "link": {
+        "type": "generated-index",
+        "description": "patika.dev üzerindeki Django yol haritası"
+    }
+}
