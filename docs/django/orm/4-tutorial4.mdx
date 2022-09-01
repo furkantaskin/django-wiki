@@ -12,7 +12,7 @@ Django içinde tüm sorularımız güzel bir şekilde dinamik bir yapıda listel
 
 Öncelikle detail.html içinde biz normalde soruya ait seçeneklerimiz listeliyorduk ancak herhangi bir işlem yapamıyorduk. Artık bu kısmı biraz değiştirip güzel bir form ekleyebiliriz. Öncelikle detail.html dosyasını elden geçiriyoruz.
 
-```html title="apps/polls/templates/detail.html"
+```django title="apps/polls/templates/detail.html"
 <form action="{% url 'polls:vote' question.id %}" method="post">
 {% csrf_token %}
 <fieldset>
@@ -51,7 +51,7 @@ Ardından her bir input değerini seçeneklerden alıyoruz. Burada choice değer
 
 Sırada formumuzun işlemlerini düzenlemede. Ön yüz her ne kadar olsa da bunu arka tarafta veri tabanına göndermemiz ve modellerimiz güncellememiz gerekecek. Hatırlarsak views için kullanıcıdan gelen isteğe göre sayfada özelleştirmeler yapan bir yapı demiştik. İşte bunu bu kısımda daha iyi anlayacağız. Öncelikle views.py içindeki vote fonksiyonumuzu "**birazcık**" değiştiriyoruz. 
 
-```python title="apps/polls/views.py"
+```py title="apps/polls/views.py"
 # highlight-start
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
@@ -97,7 +97,7 @@ def vote(request, quest_id):
 Kodumu uzun gelse de aslında çok bir işlem yok. Öncelikle bazı kütüphaneler ekledik, bunları zaten içeride kullandıkça anlatacağız. Sonrasında bizim seçilen cevabımızın nereden geleceğini göstermek için o cevabın tanımlı olduğu sorudaki cevaplara bakıyoruz. Ve diyoruz ki kullanıcının post ettiği veri bizim sorumuzda bulunan cevaplar içinden geliyor. Eğer burada bir hatamız varsa (örneğin cevap seçmeden gönder demek gibi) o zaman kullanıcımıza bir hata var burada, sen bir seçim yapmadın diyoruz. question tanımlamasını zaten detail içinde de yaptığımız için template içinde kullanacağımız biliyoruz. Burada gördüğümü iki farklı satır var. Birincisi `selected_choice.save()` ve ikincisi `return HttpResponseRedirect(reverse('polls:results', args=question.id))` satırı. Burada .save() kısmı veriyi veri tabanına kaydederken return kısmı ise kulanıcınn birden fazla oy kullanmasını önlemek için bizi belirlediğimiz bir sayfaya yönlendiriyor. Biz burada gidilecek sayfa olarak results sayfasını seçtik. Results sayfasını ise views içindeki result fonksiyonuyla kontrol ediyorduk. Artık kullanıcımız oy kullandığı için onu sonuçlar sayfasına iletebiliriz. Bunun için result fonksiyonunu da biraz değiştireceğiz. 
 
 
-```python 
+```py 
 def result(request, quest_id):
     question = get_object_or_404(Question, pk=quest_id)
     return render(request, 'results.html', {'question': question})
@@ -105,7 +105,7 @@ def result(request, quest_id):
 
 Ardından templates klasörümüze bir de results.html dosyası oluşturacağız. Burada sorumuzun altına cevaplarımızı gösterip hangisinin kaç oy aldığını göstermemiz lazım. Bunun için html dosyasına bir ekleme yapıyoruz.
 
-```html title="apps/polls/templates/results.html" 
+```django title="apps/polls/templates/results.html" 
 <h1>{{ question.question_text }}</h1>
 
 <ul>
@@ -133,7 +133,7 @@ Burada ilgimi çeken tek kısım şu oldu: Eğer yönetim paneline başka bir so
 İşin aslında bir tık karışık kısmına geliyoruz. Normalde views içinde her şeyi birer fonksiyon ile halledip sonucu render ediyorduk. Ancaj Django, felsefesi içerisinde KISS (Keep it simple stupid) mantığı gütmekte. Bunu daha medeni söyleyecek olursak "less code is better" diyebiliriz. Peki bu nasıl olacak? Yani elimizdeki kod zaten kısa değil mi? Her fonksiyon en fazla iki satır alıyor. Evet kısa ancak işlevsellik de önemli. Bunu da Django "generic" dediğimiz yapı ile sağlıyor. Aslında kodumuz kısa olsa da urls.py içinde kontrol yeri gelince zorlaşabilir. Bunun önüne geçebiliriz. Peki nasıl? 
 
 
-```python title="apps/polls/urls.py"
+```py title="apps/polls/urls.py"
 from django.urls import path
 from . import views
 
@@ -150,7 +150,7 @@ urlpatterns = [
 
 Farkındaysaanız geni birkaç yapı geldi. Artık quest_id şeklinde url içinde sorgulama yapmıyoruz. Tek yapıtğımız sorunun kendi id'sini göndermek (buradaki pk Primary Key anlamına geliyor. Bu da bizim id değerimize eşit). Sırada views.py içinde güncelleme yapma vakti.
 
-```python title="apps/polls/views.py"
+```py title="apps/polls/views.py"
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse

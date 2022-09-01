@@ -1,0 +1,145 @@
+---
+sidebar_position: 2
+custom_edit_url: null
+description: "Python'da OOP ve sınıf yapısı"
+---
+
+# Python ve Sınıf yapısı
+
+Python da birçok dil gibi OOP (Object-Oriented Programming / Nesne Yönelimli Programlama) destekleyen bir dildir. OOP presinpleri için şu anda notum hazır değil. Onu da hazırladıktan sonra gerekli yerlere yönlendireceğim.
+
+Nesne Yönelimli Programlama'ya ufak da olsa [önceden değinmiştik.](../page3.mdx) Sıra bunu Python içinde görmeye geldi.
+
+## Sınıf 
+
+Sınıflar içindeki veriler **attribute** ve fonksiyonlar **method** olarak tanımlanır. Örneğin bir şirketi OOP mantığı ile düzenlersek personel için bir sınıf açabiliriz.
+
+```py
+class Employee:
+    pass
+```
+
+Burada bazı terimleri bilmekte fayda var. Bunu [TutorialsPoint üzerinden](https://www.tutorialspoint.com/oop-terminology-in-python) detaylıca inceleyebiliriz. Kısaca şöyle bir not tutalım
+
+- **Class (Sınıf)**: Nesneleri ve özelliklerini tanımlarken kullanırız. Bunu bir tür olarak düşünebiliriz. Mesela Audi bir araba sınıfına aittir veya Garfield bir kedi sınıfına aittir.
+- **Class Variable**: Sınıf içindeki objelerin ortak olarak kullandığı değişkenlerdir. Mesela kediler için ayak sayısı veya çıkardığı ses gibi.
+- **Data Member**: Sınıf veya nesneleri ile alakalı verileri tutan sınıf veya instance değişkenidir.
+- **Function Overloading**: Belirli bir fonksiyona birden fazla işlev katma eylemidir. Örneğin sum fonksiyonu hem a ile b'yi toplayabilir hem de a,b,c'yi toplayabilir. Örneğin
+```py
+class Deneme:
+    def sum(self,a,b):
+        return a+b
+    def sum(self,a,b,c):
+        return a+b+c
+```
+Bu şekilde aynı fonksiyona birden fazla işlev atadık.
+
+- **Instance Variable**: Sınıf içinde tanımlanan instance'ta sadece o instance'a ait olan değişkenlerdir. Yani arada farklı bir duruma sahip instance varsa o instance'ı diğerlerinden ayıracak değişkendir. Örneğin her ne kadar kedilerin hepsi renkli olsa da bu kediden kediye değişir. İşte bu değişikliğe biz instance variable diyoruz.
+- **Inheritance**: Kalıtım olarak da geçen Inheritance aslında bizim biyolojideki terimimizin aynısıdır. Bir sınıfın başka bir sınıftan veya sınıflardan türetilmesidir. Bunu anne baba çocuk gibi düşünebiliriz. Elimizde A ve B sınıfları olsun. Buradaki B sınıfının A sınıfından alacağı temel özellikler varsa bunları alıp üstüne oynama yapabiliriz. Mesela kediler ve köpekler hayvanlar aleminde yakın özelliklere sahiptir. Bunları birer inhteritance ile hayvanlar sınıfından çekebiliriz.
+```py
+class Animals:
+    def __init__(self, paws,color,tail):
+        self.paws = paws
+        self.color = color
+        self.tail = tail
+
+class Cat(Animals):
+    pass
+```
+
+- **Instance**: Her sınıfın birer birey özelliğidir. Yani buradaki kedinin pati sayısı, rengi ve kuyruğu birer instance olarak iş görür.
+- **Instantiation**: Instance oluşturma işlemidir.
+- **Method**: Sınıf içindeki fonksiyonlara method deriz.
+- **Object**: Sınıfı tarafından tanımlanan özel veri yapısıdır. Örneğin `Cat` sınıfına biz Garfield'ı eklediğimizde Garfield artık bir object olacaktır.
+```py
+garfield = Cat(4, "orange", "long")
+```
+
+Örnek bir class ve object oluşturalım.
+
+```py
+class Employee:
+    def __init__(self, name, last, age, pay):
+        self.name = name
+        self.last = last
+        self.age = age
+        self.pay = pay
+    
+emp_1 = Employee("Furkan", "Taşkın", 26, 100)
+print(emp_1.name) # Furkan
+print(emp_1.age) # 26
+```
+
+Buradaki `def __init__` magic method veya dunder olarak geçer. Biz "Furkan" isimli nesne oluşturduğumuz zaman ilgili sınıfa gider ve başta gelebilecek bilgileri kendisi belirler. Yani Furkan'ın ismi, soyismi, yaşı ve maaşı olacağını anlar. Furkan'ın soyadını çektiren şey ise, yani `print(furkan.last)` dediğimizde "Taşkın" ibaresini döndüren şey `self` olmaktadır. Self aslında o nesnenin veya instance'ın kendisine sesleneceğini belirtmektedir. Yani o nesnenin kendi bilgilerini getirmemiz gerektiğini söyler. Detaylı bilgi için [tıklayınız.](https://www.tutorialsteacher.com/python/magic-methods-in-python#:~:text=Python%20%2D%20Magic%20or%20Dunder%20Methods,class%20on%20a%20certain%20action.)
+
+Örneğin sınıf içindeki bir fonksiyonla bu çalışanın bilgilerini ekrana bastırabiliriz:
+```py
+class Employee:
+    def __init__(self, name, last, age, pay):
+        self.name = name
+        self.last = last
+        self.age = age
+        self.pay = pay
+    def fullname(self):
+        print(f"My name is {self.name} and surname is {self.last}")
+
+emp_1 = Employee("Furkan", "Taşkın", 26, 100)
+emp_1.fullname() # My name is Furkan and surname is Taşkın
+```
+
+Aslında fark ettiysek bizim fonksiyona bir argüman göndermedik ama fonksiyon bizim Furkan Taşkın'a bakacağımızı anladı. İşte bunu sağlayan şey `self` ibaresidir. O an baktığımız instance ne ise onunla ilgilendiğimizi ve verilerin ondan geleceğini söylemektedir. Eğer Python içinde bir metoda siz self eklemezseniz, Python o metodu çağırırken kendisi ekleyecektir ve argüman almayan bir fonksiyona argüman gönderdiğimizi düşünerek hata verecektir.
+
+
+## Sınıf Değişkeni (Class Variable)
+
+Instance variable üzerine değinmiştik. Kedilerin renkleri ortak olsa da bu renkler kendi içinde ayrılır. Yani tüm kediler renkli olabilir ama bu renkler turuncu, tekir, siyah, beyaz, gri şeklinde değişebilir. Kedinin karakteristikleri olan bu renklere biz instance variable diyoruz. 
+
+Peki kediler içinde ortak olan pati sayısı, kuyruk uzunluğu, sesi gibi ortak özellikleri her kedi için tanımlamak gerekiyor mu? Tabii ki hayır. İşte bunun için class variable kullanıyoruz. Mesela bir kedinin sesi miyav olarak çıkıyorsa ve 4 patisi varsa bunları biz class variable olarak sınıf içinde tanımlayabiliriz.
+
+Elimizdeki örneğe göre düşünecek olursa tüm personellerimizin kendi içinde farklılığı olsa da (isim, soyisim, yaş, maaş) zam oranlarının aynı olduğunu düşünelim. 
+
+```py
+class Employee():
+    raise_percent = 1.05
+    
+    def __init__(self, name, last, age, pay):
+        self.name = name
+        self.last = last
+        self.age = age
+        self.pay = pay
+    
+    def apply_raise(self):
+        self.pay = self.pay * Employee.raise_percent
+```
+
+Burada `raise_percent` değeri sınıfa ait olduğu için tıpkı instance için yaptığımız `self` gibi sınıf değişkenlerine de sınıfın adını yazarak o veriyi çağırabiliyoruz.
+
+Oluşturduğumuz instance'ın verilerini görmek için özel bir dahili metod kullanabiliriz. `print(emp_1.__dict__)` şeklinde bir tanımla bizim oluşturduğumuz personel isim, soyisim, yaş ve maaş gibi bilgilerine erişebiliriz. Bu bilgileri bize dictionary formatında verecektir.
+
+Class variable'lar dilersek güncellenebilir. Bunu ilgili sınıfın adı ile yapabiliriz. Örneğin zam oranı değiştiyse bunu şu şekilde güncelleriz
+```py
+Employee.raise_percent = 1.06
+```
+
+Artık bu fonksiyonu tüm personellerimiz için çalıştırdığımız zaman zam oranı %5 yerine %6 olarak düşünülerek çalışacaktır.
+
+Biz bu verileri tutuyoruz ancak elimizdeki Employee, yani çalışan sayısını da kontrol etmek istiyoruz. O zaman burada basit bir ekleme yapmamız yeterli olacaktır.
+```py
+class Employee():
+    raise_percent = 1.05
+    # This line active
+    num_emp = 0
+    
+    def __init__(self, name, last, age, pay):
+        self.name = name
+        self.last = last
+        self.age = age
+        self.pay = pay
+        # This line active
+        Employee.num_emp += 1
+    
+    def apply_raise(self):
+        self.pay = self.pay * Employee.raise_percent
+```
+
+Artık her personel oluşturuşumuzda sınıfın içindeki `num_emp` değeri artacaktır. Yani 10 personel oluşturduysak bu sayı en son 10 olacktır.

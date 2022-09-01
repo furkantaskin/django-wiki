@@ -1,0 +1,8 @@
+{
+    "label": "İleri Python Dersleri",
+    "position": 4,
+    "link": {
+        "type": "generated-index",
+        "description": "Python'da ileri konular ve sınıf yapısı"
+    }
+}

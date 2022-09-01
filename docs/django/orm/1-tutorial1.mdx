@@ -61,7 +61,7 @@ Uygulama, daha doğrusu bir web uygulaması, spesifik bir olaya yönelik hizmetl
 
 Şimdi ilk görüntülememizi yazalım. Öncelikle polls içindeki `views.py` içine gidiyoruz.
 
-```python title="apps/polls/views.py"
+```py title="apps/polls/views.py"
 from django.http import HttpResponse
 
 
@@ -77,7 +77,7 @@ Sonrasında sistemin bunu tanıyabilmesi için polls içine `urls.py` dosyası a
 <Tabs>
   <TabItem value="polls" label="apps/polls/urls.py">
 
-```python 
+```py
 from django.urls import path
 from . import views
 
@@ -89,7 +89,7 @@ urlpatterns = [
   </TabItem>
   <TabItem value="core" label="core/urls.py">
 
-```python 
+```py 
 from django.contrib import admin
 from django.urls import path, include
 
@@ -109,7 +109,7 @@ urlpatterns = [
 
 Django kendi içinde varsayılan zaman dilimi olarak UTC saatini alır. Bu bizim ülkemize göre 3 saat geridedir. Türkiye merkezli bir sistem yapıyorsak core içindeki `settings.py` dosyasında ufak bir düzenleme gerekiyor. Aşağıda belirtilen `TIME_ZONE` ifadesini bulup içindeki değeri Asia/Istanbul yapmak yeterlidir.
 
-```python title="core/settings.py"
+```py title="core/settings.py"
 TIME_ZONE = 'Asia/Istanbul'
 ```
 :::

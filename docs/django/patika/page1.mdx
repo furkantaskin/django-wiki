@@ -12,6 +12,8 @@ Burada Git içerisindeki temel komutları öğreniyoruz.
 
 Temel komutlarımızı yazmada fayda var
 
+## Temel Git Komutları
+
 - `git init` ile local repomuzu oluştururuz.
 - `git add` ile eklenecek dosyaları işaretleriz. Burada `git add .` demek tüm dosyaları ekleyecektir.
 - `git status` ile dosyaların durumuna bakarız. Bu komut bize değişiklikleri veya hazırdaki commitleri mesajları ile gösterir.
@@ -22,6 +24,9 @@ Temel komutlarımızı yazmada fayda var
 - `git reset --hard commitid` ile verilen commit ID'ye kadar olan tüm commitleri temizler. Ancak pek kullanılması önerilmez (commit ID'nin ilk 7 basamağının olması yeterlidir).
 - `git revert commitid` ile verilen commit ID’ye göre o committeki değişiklikleri iptal ederiz.
 - `git diff commitid..commitid filename` iki commit ID arasında filename isimli dosyada ne değişiklikler olduğunu görebilliriz.
+
+## Git ile Branch ve Stash Üzerine Çalışma
+
 - `git branch` mevcut branchleri görebiliriz.
 - `git branch name` ile name isimli yeni bir branhc açarız ancak sistem bu branch'i kullanmaz.
 - `git checkout name` ile name isimli branch'a geçiş yapmış oluruz.
@@ -85,3 +90,16 @@ Burada Powershell tipi terminaller kullanımda hata verebilir. Bunun için `git 
 `git stash pop` ile son eleman gelir ve stash listesinden kalkar ancak `git stash apply` ile eklenen stash verisi direkt olarak sistemden silinmez. Stash içinde varlığını sürdürmeye devam eder.
 
 :::
+
+
+## Git ile Merge, Rebase ve Conflict
+
+
+- Branch içindeki değişiklikleri master branchine aktarmak için şu şekilde çalışabiliriz. Eğer hala master içindeysek `git checkout master` komutuna gerek yoktur. Ancak başka branch içindeysek o kodu kullanabiliriz.
+```git 
+git checkout master
+git checkout header
+```
+
+- Branch içindeki değişiklikler master içine aktarıldığında tüm commitler de gelecektir ancak başkasının commitlere bakması durumunda merge durumunu görmesi zor olacaktır. Bunun önüne geçmek için `git merge --squash branchname` ile bu işlemi yapabiliriz. Sonrasında yeni commit açarak bu merge işlemini belirtebiliriz.
+- Merge ederken hata ile karşılaşırsak burad dilersek doğru kodu tutup diğerini silip commit de yapabiliriz veya `git merge --abort` yaptıktan sonra değişiklikleri gözden geçirip son hali de baz alabiliriz.

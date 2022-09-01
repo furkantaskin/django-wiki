@@ -13,7 +13,7 @@ import TabItem from '@theme/TabItem';
 [Önceki konumuzda](1-tutorial1.mdx) ilk uygulamamızı ve projemizi oluşturup ekrana ilk çıktımızı vermiştik. Sıra geldi veri tabanı ile iletişime. Django burada MVC temelli yapı kullandığı için gerekli sınıflarımızı oluşturmamız gerekiyor. Bunu uygulamamıza spesifik yapacağız. Yani polls içindeki `models.py` dosyasını düzenleyeceğiz.
 
 
-```python title="apps/polls/models.py" 
+```py title="apps/polls/models.py" 
 from django.db import models
 
 
@@ -39,7 +39,7 @@ Burada bilmemiz gereken şeyler nelerdir? Django veri tabanı oluştururken değ
 <Tabs>
   <TabItem value="settings" label="core/settings.py">
 
-```python
+```py
 
 INSTALLED_APPS = [
     # highlight-start
@@ -59,7 +59,7 @@ INSTALLED_APPS = [
 
   <TabItem value="apps" label="apps/polls/apps.py">
 
-```python 
+```py 
 from django.apps import AppConfig
 
 class PollsConfig(AppConfig):
@@ -90,7 +90,7 @@ py manage.py migrate
 Burada modelimiz QuerySet içinde geldiğinde pek hoş olmayan bir çıktı verecektir. Bu çıktıyı güzelleştirmek için default return değeri verebiliriz. Bunun için models.py içinde yeni bir güncelleme yapacağız.
 
 
-```python title="apps/polls/models.py" 
+```py title="apps/polls/models.py" 
 from django.db import models
 
 
@@ -131,7 +131,7 @@ Burada bizden bir admin kullanıcı adı, eposta ve parola isteyecektir. Parolay
 
 Admin paneline girdiğimizde Question veya Choice alanı olmayacak. Bunları bizim panele kaydetmemiz gerekiyor. Bunun için proje içindeki admin.py dosyasına gitmemiz lazım. 
 
-```python title="apps/polls/admin.py" 
+```py title="apps/polls/admin.py" 
 from django.contrib import admin
 from .models import Question, Choice
 

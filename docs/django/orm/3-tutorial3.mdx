@@ -14,7 +14,7 @@ View, belirli bir görevi üstlenen ve template mantığı ile ilerleyen bir Dja
 Polls içindeki `views.py` dosyasına gidip fonksiyonlarımızı ekleyerek başlıyoruz. Hatırlarsak önceki kısımda 4 farklı olaydan bahsetmiştik. Buradaki oylama, sonuçlar ve sorular durumları için birer fonksiyonla çalışacağız. Önceki kodumuza dokunmadan aşağıdaki fonksiyonları ekleyebiliriz.
 
 
-```python title="apps/polls/views.py" 
+```py title="apps/polls/views.py" 
 def detail(request, quest_id):
     return HttpResponse("You're looking at question %s." % quest_id)
 
@@ -32,7 +32,7 @@ def vote(request, quest_id):
 Sırada bu fonksiyonları urls içine kaydetmesi var. Burada birkaç kısmı anlamayabilirsiniz.
 
 
-```python title="apps/polls/urls.py"
+```py title="apps/polls/urls.py"
     path('<int:question_id>/', views.detail, name="detail"),
     path('<int:question_id>/result', views.result, name="result"),
     path('<int:question_id>/vote', views.vote, name="vote")
@@ -53,7 +53,7 @@ Artık Django buradaki gelen URL parametrelerine göre en uygun fonksiyonu çağ
 Şimdi index içinde sorularımızı listeletelim. Böylecek kullanıcı polls içine girince direkt olarak soruları görebilirir.
 
 
-```python title="apps/polls/views.py" 
+```py title="apps/polls/views.py" 
 # Burada sadece highlight edilen kısmı değiştirdik. Diğerleri yine aynı 
 
 from django.http import HttpResponse
@@ -92,7 +92,7 @@ Buradaki `objects` metodu için [Django'nun sitesindeki QuerySet API sayfasını
 Buradaki tüm kodlarımızı views içinde yaptık ama bir sorun var. Sitemizin HTML/CSS ile hazırlanan bir ön yüzü varken bu dinamik içeriği içeriye nasıl ekleyeceğiz? İşte bu kısımda template sistemini kullanacağız. Şimdi Polls uygulaması içine template klasörü açıp içine bir index.html dosyası ekliyoruz.
 
 
-```html title="apps/polls/templates/index.html"
+```django title="apps/polls/templates/index.html"
 
 {% if latest_question_list %}
     <ul>
@@ -110,7 +110,7 @@ Buradaki tüm kodlarımızı views içinde yaptık ama bir sorun var. Sitemizin 
 Burada latest_question_list varsa eğer ul listelemesi yapılacaktır. Eğer liste boşsa herhangi bir soru olmadığını söyleyeceğiz. Peki buradaki latest_question_list terimini Django nasıl bilecek? Bunu views.py içinde yapacağız. index fonksiyonumuza ufak bir ekleme gerekiyor
 
 
-```python title="apps/polls/views.py"
+```py title="apps/polls/views.py"
 from django.http import HttpResponse
 from .models import Question
 # highlight-start
@@ -142,7 +142,7 @@ Artık template içindeki latest_question_list teriminin Django hangi listeye ya
 
 Peki elimizde bir soru yoksa o soruya ait sayfaya gidince ne yapacağız? İşte bunun için bir try catch metodu gerekecektir. Soruların detay sayfası için bir düzenleme yapacağız. Öncelikle templates klasörüne (index.html dosyasının olduğu dizine) detail.html dosyası oluşturun ve içine sadece `{{question}}` ifadesini ekleyin. Sonrasında views içindeki detail fonksiyonunda ise şöyle bir düzenleme yapın.
 
-```python title="apps/polls/views.py" 
+```py title="apps/polls/views.py" 
 def detail(request, quest_id):
     try:
         question = Question.objects.get(pk=quest_id)
@@ -161,7 +161,7 @@ Burada beşinci satırdaki `Http404` kısmı hata verecektir. Bunun için HttpRe
 Burada try except ile kod kalabalığı oluşuyor olabilir. Bunu daha kolay bir şekilde de halledebiliriz. Dilerseniz tüm fonksiyonu şu şekilde de yapabiliriz:
 
 
-```python 
+```py 
 def detail(request, quest_id):
     question = get_object_or_404(Question, pk=quest_id)
     return render(request, 'detail.html', {'question': question})
@@ -178,7 +178,7 @@ Aynı şekilde buradaki `get_object_or_404` kısmını çalıştırabilmek için
 
 Normalde bizim Question ve Choice olarak iki sınıfımız vardı. Bunları çok güzel bir şekilde kullandık ama bir sorun var. Sorunun sayfasında o soruya ait seçimleri göstermemiz gerekiyor. Bunu nasıl yapacağız? İşte bu kısım da çok basit. Öncelikle detail.html dosyasını şu şekilde düzenliyoruz.
 
-```html title="apps/polls/templates/detail.html"
+```django title="apps/polls/templates/detail.html"
 <h1>{{ question.question_text }}</h1>
 <ul>
 {% for choice in question.choice_set.all %}
@@ -191,7 +191,7 @@ Normalde bizim Question ve Choice olarak iki sınıfımız vardı. Bunları çok
 
 Burada `question.choice_set.all` kısmında choice_set ifadesi nereden geliyor bilmiyor olabiliriz. Bunu Django `sınıfismi_set` olarak alır. Burada kafa karıştırabileceğini düşünüyorsanız model içinde ufak bir düzenleme yapabilirsiniz. Choice sınıfı içindeki şu satırı düzenliyoruz
 
-```python title="apps/polls/models.py"
+```py title="apps/polls/models.py"
 question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name="choices")
 ```
 
@@ -203,7 +203,7 @@ ForeginKey kısmına related argümanı ekleyerek bunu dilediğiniz bir string y
 
 Şu ana kadar her şey çok güzel çalışıyor. Peki URL'ler nasıl olacak? Yani anketler sayfasındaki anketlere tıklamak istediğimizde bu linkleri nasıl dinamik yapacağız. Django bu soruun büyük bir kısmını urls.py içinde kendi başına hallediyor. Bizim yapmamız gereken şey sadece birkaç ufak dokunuş. Öncelikle index.html içinde şöyle bir satır düzenlemesi yapıyoruz.
 
-```html title="apps/polls/templates/index.html"
+```django title="apps/polls/templates/index.html"
 {% if latest_question_list %}
     <ul>
     {% for question in latest_question_list %}
@@ -225,7 +225,7 @@ Normalde bu satırdaki link `/polls/{{ question.id }}/` şeklinde geliyordu. Uyg
 
 Peki namespace mantığında neler var? Öncelikle farkındaysak biz sadece bir uygulama oluşturduk. Peki birden fazla uygulama olursa ne yapacağız? İşte bunun için namespace özelliğimiz var. Bunu kullanma sebebimiz index.html içindeki url kısmının hangi uygulamadan geleceğini belirlemede kullanılıyor. Sadece burası değil, dinamik url için gereken en büyük faktör aslında namespace içinde dönüyor. Burada basitçe urls.py içinde gidip urlpatterns'tan önce `app_name = 'polls'` veya uygulama adınız neyse ona göre tanımlama yapmak. Artık index.html içinde hangi uygulamadan hangi linki çekeceğimiz belirleyebiliriz. Yani index.html içinde link satırını tekrar elden geçireceğiz.
 
-```html title="apps/polls/templates/index.html"
+```django title="apps/polls/templates/index.html"
 {% if latest_question_list %}
     <ul>
     {% for question in latest_question_list %}

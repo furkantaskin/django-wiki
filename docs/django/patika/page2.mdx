@@ -1,0 +1,385 @@
+---
+sidebar_position: 2
+custom_edit_url: null
+description: "Python'a dair kısa notlar"
+---
+
+# Python Notları
+
+Burada detaylı bir bilgi bulunmamaktadır. Kendime göre notlar tutmaktayım.
+
+## Temel Bilgiler
+
+- Temel veri tipleri integer, float, string, boolean'dır. `type(variable)` ile tipini görebiliriz.
+- Temel operatörler ' + - * ** / // % ' şeklindedir. Bu operatörler sırasıyla toplama, çıkarma, çarpma, üs alma, bölme, kalanlı bölümdeki bölüm sonucunu verme ve kalan bulma şeklindedir. Bölüm her zaman float döner.
+- Float bir ifade int forma dönüştürülürse yuvarlama yapılmaz, sadece ondalıklı kısım silinir. Yani `int(4.9)` için çıktı 5 olmaz 4 olur.
+- Stringlerde slicing yaparken bitiş değeri son değerden büyükse hata olmaz, sadece indexing kısmında hata verir.
+- Python içinde throwaway variable olarak adlandırılan '_' (alt çizgi) şeklinde değişkenler de vardır. Bu değişkenler genelde göz ardı edilir. Örneğin `a, _ , b = (10, 20,30)` olursa a değeri 10 ve b değeri 30 olacaktır. Alt çizgiden dolayı 20 değeri atlanacaktır. For döngüsünde de eğer for indeksine bağlı bir işlem yoksa kullanılabilir.
+
+```python 
+a = 5
+b = 0
+for i in range(a):
+    b+=i # Burada i ile işimiz var
+
+# Peki i lazım olmazsa
+for i in range(a):
+    b+=1 # Burada i için herhangi bir işlem yok. Sadece döngüde ilerleme yapıyor.
+
+for _ in range(a)
+    b+=1 # Bu sayede gereksiz indexlemeden kurtulduk.
+```
+
+Ayrıca değişken değeri içinde kullanılırsa da Python görmezden gelecektir. Örneğin `a = 900000` ifadesi ile `a=900_000` ifadesi aynı değere sahiptir. İkisi de Python tarafından 900.000 (dokuz yüz bin) olarak algılanacaktır. 
+
+
+## Short-Circuit
+
+| Operation | Result | Explanation | 
+| :---: | :---: | :---: |
+| X or Y | Eğer X False dönerse Y <br/> Eğer X True ise X | Burada ilk değerden True gelirse sistem direkt olarak onu çalıştırır. Diğer durumda Y değerini de inceleyerek bir karar verir |
+| X and Y | Eğer X False dönerse X <br/> Eğer X True dönerse Y | Eğer X True dönerse bu durumda Y durumu çalışacaktır, aksi taktirde X False olursa X çalışacaktır. |  
+
+
+## Ternary
+
+Burada ilk kısım işlemi, ikinci kısım if durumunu, üçüncü kısım ise else durumunu gösteriyor.
+
+```python 
+a,b = 10,20
+
+# Geleneksel yöntem
+if a < b:
+    print(a) # 10 çıktısı gelecektir
+else:
+    print(b)
+
+# Ternary
+
+print(a) if a < b else print(b) # 10 çıktısı gelecektir
+```
+
+## Listeler
+
+### List
+
+Listeler ile stringler aynı çalışır. Indexleme ve slicing aynıdır. Listelerde bazı fonksiyonlar vardır. Listeler mutable'dır. Yani verileri güncellenebilir.
+
+- `len(list)`: Listenin uzunluğunu verir
+- `list.append(val)`: Listeye val değerini ekler
+- `list.extend(val1, val2, val3)`: Birde fazla değeri listeye ekler
+- `list.insert(index,val)`: Listenin verilen indeksine o değeri ekler
+- `list.remove(val)`: Listede ilk görüğü val değerini siler. Değer yoksa hata verir
+- `list.pop(index)`: Listenin indexteki değerini siler. Ancak remove'dan farklı olarak bir değişkene atanabilir. Örneğin
+
+```python
+a=[1,2,3,4]
+
+a.remove(0) # 1 değeri listeden silinir. Artık yeni liste [2,3,4] olur.
+
+b = a.pop(0) # Yeni listemize göre 2 değerini listeden çıkarır ve bunu b değerine ekler. 
+
+print(b) # b değeri 2 olarak döner.
+
+```
+
+Listelerde aliasing yapıldığı zaman yeni değer de güncellenir. 
+
+```python 
+a = 5
+b = 5
+a +=1
+
+# Artık a değeri 6 ve b değeri 5 oldu. A ile birlikte güncellenmedi.
+
+
+list = [1,2,3]
+l2 = list
+
+list.append(4)
+
+""" 
+l2 de artık [1,2,3,4] şeklinde oldu. Yani normal değişken gibi değer almadı. Aksine etiket aldı.
+Eğer yeni liste oluşacaksa ve list'e bağlı olmayacaksa şu şekilde olur 
+"""
+
+l3 = list.copy()
+```
+
+
+- `list.index(val)`: Val değerinin ilk hangi indekste olduğunu söyler.
+- `list.reverse()`: Listeyi tersine çevirir.
+- `sorted(list)`: Listeyi varsayılan olarak küçükten büyüğe sıralar ama listeyi direkt güncellemez. Yeni değişkene atamak için idealdir. Orijinal veriye dokunma.
+- `list.sort()`: Yeni listeyi varsayılan olarak küçükten büyüğe sıralar ve bunu yeni liste olarak kaydeder. Yani artık `print(list)` dediğimzde yeni sıralanmış listeyi ekrana yazar.
+
+Liste elemanlarını stringe çevirmek için `"pattern".join(list)` yapabilir. Örneğin liste `list=["merhabalar", "efendim"]` şeklinde ise ve biz bunu string yapacaksak `" ".join(list)` yapabiliriz.
+
+
+### Tuple
+
+- Immutable'dır. 
+- (elem1, elem2, ...) şeklinde gelir
+
+
+### Dictionary
+
+- key:value şeklinde veri tutar. Süslü parantez `{}` ile tanımlanır.
+- Listedeki gibi indeksleme yerine key değeri ile veri bulur.
+```python 
+a= [1,2,3]
+b = {"x": 1, "y": 2, "z": 3}
+a[0] # 1 değeri döner
+b["x"] # 1 değeri döner
+
+```
+
+İç içe de gidebiliriz.
+
+```py
+ogrenciler = {
+    "Ayşe": {
+        "not": 80,
+        "ogrencino": 123
+    },
+    "Ali" : {
+        "not": 40,
+        "ogrencino": 124
+    },
+    "Veli" : {
+        "not": 50,
+        "ogrencino": 125
+    }
+} 
+
+
+ogrenciler["Ali"] # {"not": 40, "ogrencino": 124}
+ogrenciler ["Ali"]["not"] # 40
+
+```
+
+Listedeki gibi append ile veri eklemeyiz. Aksine direkt key-value olarak ekleyebiliriz. Örneğin listede mehmet diye kimse yoksa `notlar["Mehmet"] = 40` şeklinde ekleme yapabiliriz.
+
+Dictionary içinden `del[key]` ile veri sileriz.
+
+
+Dictionary içinde for döngüsü indeks yerine key değerini baz olarak çalışır. Yani şu şekilde çalışır
+
+```py
+d = {"student_1": [90,89], "student_2": [80,83], "student_3": [72,71]}
+
+for k in d:
+    print(k) # student_1, student_2 ... şeklinde çıkar
+
+for k in d:
+    print(d[k]) # [90,89] [80,83] ... şeklinde çıkar
+
+for k in d.values():
+    print(k) # sadece valueler çıkar
+```
+
+
+
+### Set
+
+Özgün verileri tutar. Yani bir veri tekrar etmez. İndekslenemezler ve mutable formdadır. Süslü parantez `{}` ile oluşturulur.
+
+```py
+a = {1,2,3,4}
+```
+
+String ile set oluşturulursa boşluk ve noktalama da sete dahil olur.
+
+```py
+s = "Merhabalar nasılsınız"
+print(set(s)) # {'n', 'h', 'M', 'z', ' ', 'ı', 'l', 'e', 'r', 'b', 's', 'a'} çıktısınız verir
+```
+
+`set.add(val)` ile eleman ekler ve `set.remove(val)` ile eleman sileriz. İndeksleme olmadığı için `set[index]` bize hata verir.
+
+İki set arasındaki farkı - operatörü veya difference ile kontrol edebiliriz.
+
+```py
+s1=set([1,2,3])
+s2=set([3,4,5])
+print(s1-s2) # {1,2,4,5}
+print(s1.difference(s2)) # {1,2}
+```
+
+`symmetric_difference`, iki kümede ortak olmayan elemanların birleşimini verir. 
+
+```py
+s1=set([1,2,3])
+s2=set([3,4,5])
+print(s2.symmetric_difference(s1)) # {1,2,4,5}
+```
+
+`intersection` ile kesişen eleman bulunur
+
+```py
+s1=set([1,2,3])
+s2=set([3,4,5])
+print(s2.intersection(s1)) # {3}
+
+# Bunu & operatörü ile de yapabiliriz veya farkın farkı da olabilir
+
+print(s2 & s1) # {3}
+print(s1 - (s1-s2)) # {3}
+```
+
+`union` ile veriler birleştirilebilir
+
+```py
+s1=set([1,2,3])
+s2=set([3,4,5])
+s1.union(s2) # {1,2,3,4,5}
+```
+
+- `s1.isdisjoint(s2)` ile kesişimin boş olup olmadığı kontrol edilir
+- `s2.issubset(s1)` ile s2'nin s1'in alt kümesi olup olmadığına bakılır. Tam tersi içinse `s2.issuperset(s1)` yapılır.
+
+### List Comprehension
+
+Listeden liste oluşturmanın basit bir yoludur. 
+
+```py
+a = [1,2,3]
+b = []
+for i in a:
+    b.append(i**2)
+
+# Bunu kısaltabiliriz
+
+b = [i*i for i in a]
+
+# Listeden sadece tekleri alacaksak 
+
+b = [i for i in a if i % 2 != 0]
+
+
+c = [1, 4, 9, 16, 25, 36, 49, 64, 81, 100]
+
+# Tekli sayıları -1 yapmak istiyorsak 
+
+d = [e if e % 2 == 0 else -1 for e in c]
+
+# Yeni listedeki -1'leri kaldırmak istiyorsak 
+
+f = [e if e % 2 == 0 else -1 for e in c if e % 2 == 0]
+
+# İç içe döngü de yapabiliriz 
+
+m = [[j for j in range(7)] for i in range(5)]
+
+"""
+[[0, 1, 2, 3, 4, 5, 6],
+ [0, 1, 2, 3, 4, 5, 6],
+ [0, 1, 2, 3, 4, 5, 6],
+ [0, 1, 2, 3, 4, 5, 6],
+ [0, 1, 2, 3, 4, 5, 6]] çıktısı gelir
+"""
+```
+
+### Variable Unpacking 
+
+`a,b,c = 1,2,3` için sorun yok ancak dizi içinden çekerken bu biraz değişebilir.
+`x,y,*z = [1,2,3,4]` bu durumda x = 1 y = 2 ve z = [3,4] değerini alır.
+
+### Enumerate
+
+Enumerate ile for döngüsünde direkt value yerine key value döner. Örneğin 
+```py
+a = ["selam", "merhaba", "adios", "amigo"]
+
+for i in enumerate(a):
+  print(i)
+"""
+(0, 'selam')
+(1, 'merhaba')
+(2, 'adios')
+(3, 'amigo')  çıktısı gelecektir
+"""
+
+# Mesela index value döndüreceksek 
+
+for i,e in enumerate(a):
+    print(i, "indeksinde bulunan eleman: ", e)
+```
+
+enumerate içinde index 0 olmak zorunda değil. Bunu biz seçebiliriz. Bunu `for i in enumerate (list, start=2)` şeklinde 2'den başlatabiliriz.
+
+### Zip 
+
+Zip ile iki diziyi birbirine tuple olarak yapıştırabiliriz. Örneğin 
+
+```py
+ogrenciler = ["ali", "veli", "ayşe"]
+notlar = [80,90,100]
+
+for s,g in zip(ogrenciler, notlar):
+    print(s, g)
+"""
+ali 80
+veli 90
+ayşe 100  şeklinde çıktı verir
+"""
+# Dictionary oluşturma
+d ={}
+for k,v in zip(ogrenciler, notlar):
+    d[k] = v
+print(d) # {'ali': 80, 'veli': 90, 'ayşe': 100}
+```
+
+## Fonksiyonlar
+
+### Predefined
+
+Fonskiyonda değişkenlerden birisinin değeri gelmemesi durumunda varsayılan olarak çekeceği değeri verebiliriz. Eğer predefined yoksa bunu ilk yazmamız gerekir. Yani 
+
+```py
+# Doğru
+def myfunc(x, y=2):
+    return x*y
+
+print(myfunc(5)) # 10
+print(myfunc(4,6)) # 24
+
+# Yanlış
+def myfunc(x=2, y):
+    return x*y    
+```
+
+### First-Class
+
+Python'da fonksiyonlara diğer veri tipleri gibi müdahale edebilir veya değişkene atayabiliriz. Python içinde fonksiyonlara first class function deniyor.
+
+```py
+def kare(x):
+    return x**2
+
+a = kare
+
+a(5) # 25 çıktısı verir
+```
+
+Ayrıca bir fonksiyonu bir başka fonksiyona argüman olarak gönderebiliriz
+
+```py
+def kup(x,f):
+    return x*f(x)
+
+def kare(x):
+    return x**2
+
+kup(5,kare) # 125 çıktısı verir
+
+# Fonksiyonları dizi olarak başka bir fonksiyona gönderebiliriz
+
+def final(f_list, x):
+    l = []
+    for f in f_list:
+        l.append(f(x))
+
+final([kare,kup], 5) # [25,125] çıktısı verir
+```
+Ayrıca dilersek fonksiyonları dizi olarak da gönderebiliriz
+

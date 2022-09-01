@@ -1,0 +1,300 @@
+---
+sidebar_position: 1
+custom_edit_url: null
+description: "İleri Python kullanımları"
+---
+
+# İleri Python Prensipleri
+
+Python ile biraz daha karmaşık konulara giriş yapıyoruz artık.
+
+
+## *args ve **kwargs
+
+args ve kwargs burada bir fonksiyona sayısı belli olmayan değişkenleri göndermeye yarar. Bizim fonksiyonumuz örnek olarak gönderilen tüm elemanları toplayan bir fonksiyon olsun. Bunu biz genelde personal wallet uygulamalarında görürüz. Biz kaç tane birim girersek girelim sonuç hep toplam olarak gelir. Normal şartlarda biz fonksiyonlarda hep beliri sayıda argüman göndermiştik. Ancak bu kişiden kişiye değişiklik gösterebilir. Bu durumda args ve kwargs kısımları devreye girer.
+
+### *args
+
+Args mantığı yukarıda bahsettiğimiz gibi gelen belirsiz sayıda veriyi içeriye tuple olarak alıp bunu kullanmayı sağlar. Args içinde dictionary çalışmaz.
+
+```py
+def sum(*args):
+    sum = 0
+    for i in args:
+        sum += i
+    return sum
+
+```
+
+:::info 
+
+Burada illa args olarak bir şey kullanacağız diye bir kaide yok. Bunu dilerseniz `vars` ya da aklınıza gelebilecek başka bir şey olarak da kullanabilirsiniz. Burada önemli olan şey yıldız (* - asterisk) ibaresidir. Buradaki * aslında [Variable Unpacking](https://www.geeksforgeeks.org/packing-and-unpacking-arguments-in-python/) olarak geçmektedir. Yani bize gelen tüm verileri teker teker açarak ilerlemektedir.
+
+:::
+
+Burada belirtmemiz gereken şey `*args` sadece list, tuple gibi keyword içermeyen dizilerde çalışır. Dictionary için `*args` işlem yapmayacaktır. Args bu kısımda gelen verileri tuple olarak alıp işlem yapar.
+
+### **kwargs
+
+`**kwargs` ise keyword value olayını güderek argüman almayı sağlar.
+
+```py
+def students(**kwargs):
+    for v in kwargs.values():
+        print(v)
+
+students(name="Jake", student_number="401") 
+
+"""
+Çıktısı:
+
+Jake
+401
+"""
+```
+
+Unpack olmadan önceki halini de görebiliriz bu kısımda
+
+```py
+def students(**students):
+    print(students)
+    for v in students:
+        print v
+
+students(name="Jake", student_number="401") 
+
+"""
+Çıktısı: 
+
+{'name': 'Jake', 'student_number': '401'}
+name
+student_number
+"""
+```
+
+### kwargs ve args Birlikte Kullanmak
+
+`*args` ve `**kwargs` olarak bir fonksiyonda beraber kullanılabilir ancak burada sırası önemlidir. `**kwargs` burada bir keyword:value şeklinde çalıştığı için bunun fonksiyonda sona yazılması gerekir. `**kwargs` bir predefined argument olarak düşünüldüğü için Python bunun sonda olmasını beklemektedir.
+
+```py
+def weird(*args, **kwargs):
+    res = 0
+    for e in args:
+        res +=e
+    for k,v in args.items():
+        print(k, ":", v)
+
+    return res
+
+weird(1,2,3, name="Jake", student_number=401)
+"""
+Çıktısı
+
+name: Jake
+student_number: 401
+
+6
+"""
+```
+
+### Unpacking
+
+Unpacking olayını yeniden hatırlayacak olursak basit bir deneme yapabiliriz. Örneğin bir liste verip bunu `print(*liste)` şeklinde çağırırsak çıktısı bir liste değil sıralı elemanlar olacaktır. Örneğin:
+
+```py
+liste = [1,2,3,4]
+print(liste) # [1,2,3,4]
+print(*liste) # 1 2 3 4
+```
+
+Veya iki liste birleştirme yapmak istiyorsak 
+
+```py
+list1 = [1,2,3,4]
+list2 = [5,6,7]
+merged = [list1, list2] # [[1,2,3,4], [5,6,7]]
+merged_2 = [*list1, *list2] # [1,2,3,4,5,6,7]
+```
+
+Dictionary için de `**kwargs` kullanabilirsiniz
+
+```py
+d1 = {"name": "Jake", "number": 402}
+d2 = {"last_name": "Helen", "grade": 40}
+
+d_merged = {**d1, **d2} # {"name", "Jake", "number": 402, "last_name": "Helen", "grade": 40}
+```
+
+:::caution DİKKAT
+
+Eğer iki dictionary içinde `**kwargs` ile birleştirme yaparsak buradaki keylerden birisinin aynı olması durumunda aynı olan key, son dictionary içindeki o keyin değeri ile değiştirilecektir. Örneğin 
+
+```py
+d1 = {"name": "Jake", "number": 402}
+d2 = {"name": "Helen", "grade": 40}
+
+d_merged ={**d1, **d2} # {"name", "Helen", "number": 402, "grade": 40}
+```
+Görüldüğü gibi `"name": "Jake"` ifadesi artık yerini `"name":"Helen"` ifadesine bıraktı. Çünkü son dictionary içindeki değer önceki dictionary içindeki değeri değiştirdi.
+
+:::
+
+Stringler için de unpacking yapabiliriz.
+
+```py
+str_list = [*"merhabalar listem"]
+print(str_list) # ['m', 'e', 'r', 'h', 'a', 'b', 'a', 'l', 'a', 'r', ' ', 'l', 'i', 's', 't', 'e', 'm']
+```
+
+## Closure
+
+Fonksiyonlar sadece tek bir şekilde olmaz. Dilersek bir ana fonksiyon içinde bir alt fonksiyon da çağırabiliriz. Normalde fonksiyonların içerisindeki değişkenler local scope olarak geçer. Yani o fonksiyon dışındaki başka bir yerden o veriye direkt olarak erişemeyiz. Ancak o fonksiyonu çağırmamız veya değişkeni global yapmamız gerekir. Bu kısımda ise closure dediğimiz terim, alt fonksiyonun, onu kapsayan fonksiyonun değişkenlerine erişebilmesine denir. Örneğin:
+
+```py
+def outer():
+    msg = "Hello"
+
+    def inner(msg):
+        print(msg + "World")
+    return inner()
+
+outer() # "Hello World"
+```
+
+Burada outer fonksiyonu çağırdığımızda return değeri olarak inner fonksiyonundan gelen değeri verecektir. inner fonksiyonu içinde bizim çıktımız outer fonksiyonundan onu çağıran yere gideceği için çıktımız "Hello World" olacaktır.
+
+Closure ile iç içe fonksiyon arasında nasıl bir fark var peki?
+
+Normalde fonksiyonlarda ve iç içe fonksiyonlarda olay biraz alt seviyelere iner. Elimizde örnek bir iç içe fonksiyon düşünelim.
+
+```py
+def say():
+    greeting = 'Hello'
+
+    def display():
+        print(greeting)
+
+    return display   
+```
+
+Burada display fonksiyonu döner ve normalde 'Hello' değeri gelir. Peki fonksiyonu bir değişkene atarsak ne olur? 
+
+```py
+fn = say()
+fn()
+del say
+```
+
+Normalde `fn=say()` diyerek fonksiyonumuzu bir fn olarak tanımladık. `del say` dediğimizde fonksiyonumuzu sildik. Ancak biz yine gidip fn() ifadesini çağırırsak karşımıza Hello yazısı çıkacaktır. Buradaki olay referans değil değer atama şeklindedir. Normalde dizilerde hatırlarsak bir diziyi tanımladıktan sonra onu bir değişkene atarsak referans gibi çalışırdı. Örnek olarak
+
+```py
+a = [1,2,3]
+b = a
+a.append(4)
+print(b) # [1,2,3,4]
+```
+
+şeklinde bir işlemde b çıktısı bize 1,2,3,4 değerlerini verir. Çünkü a'nın değerini almaz, aksine onu referans gösterir. A'daki tüm işlemler b'yi de etkiler. Closure içinde de bunun bir değişiği olur. Normalde fonksiyon çalıştığında işlemler yapılır ve fonksiyon tozlu rafa kaldırılır. Eğer fonksiyonu silersek fn de gider, lakin bu sadece iç içe fonksiyonlar için geçerlidir. Closure olayında bu fonksiyon hafızada bir yere oturtulur ve fn bunu kaydeder. 
+
+## Decorator
+
+Öncelikle Python'da fonksiyonları birazdaha tanıyalım. Normalde fonksiyonları bir [first-class](../page2.mdx#first-class) olarak tanımlamıştık. Peki bu ne demek oluyor? 
+
+- Fonksiyon normalde bir nesnenin örneğidir (instance)
+- Bir fonksiyonu bir değişkende tutabiliriz
+- Bir fonksiyonu başka bir fonksiyona argüman olarak gönderebiliriz
+- Bir fonksiyon içinde başka bir fonksiyonu return edebiliriz
+- Fonksiyonları hash table, liste veya başka bir şekilde bir veri yapısı içinde saklayabiliriz.
+
+Şimdi fonksiyonları az biraz tanıyorsak buna göre işlemleri büyütebiliriz.
+
+Decorator dediğimiz şey bir fonksiyonun içindeki yapıyı değiştirme gereği duymadan o fonksiyonun işlevselliğini değiştirmeyi sağlar. 
+
+```py
+def shout(text):
+    return text.upper()
+ 
+print(shout('Hello'))
+ 
+yell = shout
+ 
+print(yell('Hello'))
+```
+Örneğin bu şekilde bir tanımlamada yell ile shout aynı görevi görüyor. Burada biz aslında shout fonksiyonunu artık yell ile yeniden çağırmıyoruz. Aksine shout ile işaret edilen fonksiyon nesnesine yell ile de gönderme yapıyoruz. Bunu tıpkı iki isim gibi düşünebiliriz. Yani nasıl iki farklı ismi olan bir kişiye iki ismiyle de hitap edince bakıyorsa buradaki olay da aynı görevi görüyor. 
+
+Basitçe bir decorator kuracak olursak eğer
+
+```py
+def print_func():
+    print("hey")
+
+def decorator_func(func):
+    def wrapper_func():
+        return func()
+    return wrapper_func
+
+decorated_print = decorator_func(print_func)
+decorated_print() # hey
+```
+
+Normalde `return wrapper_func` kısmında bir parantez eksik. Çünkü parantez gelmesi durumunda fonksiyon çalışacaktır. Biz aslında fonksiyonu çalıştırmıyoruz, o fonksiyona bir referansta bulunuyoruz. O metodu döndürüyoruz.
+
+Normalde decorator olayındaki amaç, eldeki fonksiyona yeni bir işlevsellik katmaktır. Biz şu ana kadar bir işlev katmadık. Biraz buna işlev katabiliriz.
+
+```py
+def print_func():
+    print("hey")
+
+def decorator_func(func):
+    def wrapper_func():
+        print(f"Fonksiyonumuzun ismi artık {func.__name__} şeklindedir.")
+        return func()
+    return wrapper_func
+decorated_print = decorator_func(print_func)
+decorated_print() 
+"""
+Çıktısı: 
+
+Fonksiyonumuzun ismi artık print_func şeklindedir.
+hey
+"""
+```
+
+Artık fonksiyonumuzu içeride bir farklı duruma yerleştirdik. Normalde başta `wrapper_func` sadece `print_func` fonksiyonunu çalıştırıyordu. Artık hem o fonksiyonu çalıştıryor hem de fonksiyonumuza program içinde verdiğimiz ismi (print_func olan kısım) ekrana yazdırıyor. 
+
+Bu yazımı kısaltmak için at metodu (@) kullanabiliriz.
+
+```py
+@decorator_func
+def print_func():
+    print("hey")
+```
+
+Bu ifade ile `decorated_print = decorator_func(print_func)` ifadesi aynı anlama gelmektedir. Yani diyoruz ki `decorator_func` a biz `print_func` fonksiyonumuzu gönderiyoruz.
+
+Burada dikkat edilmesi gereken detay, burada çağırdığımız fonksiyon aslında decorator içinde bulunan `wrapper_func` olması. Örneğin biz bu fonksiyonu argümanları ile gönderirsek ne olacaktı?
+
+```py
+def decorator_func(func):
+    # This will error
+    def wrapper_func():
+        print(f"Fonksiyonumuzun ismi artık {func.__name__} şeklindedir.")
+        return func(*args)
+    return wrapper_func
+
+@decorator_func
+def func(name, age):
+    print(f"My friend {name} is {age} years old")
+
+func("Furkan", 26)
+```
+
+Burada `wrapper_func` fonksiyonunu aslında çağırdığımız için Python bize 0 argüman alan bir fonksiyona iki argüman gönderdiğimizi söyleyecektir. Çünkü biz aslında `func` yerine `wrapper_func` fonksiyonunu çağırıyorduk. Aynı şekilde ona da bu argümanları göndermemiz gerekecektir. Yani o astırı `wrapper_func` yerine `wrapper_func(*args)` olarak güncellememiz gerekiyor.
+
+Özetlemek gerekirse decorator kavramı bizim bir fonksiyonu input olarak alıp bu fonksiyonun orijinalitesini bozmadan ona yeni işlevsellikler katmamız sağlayan yapılardır.
+
+:::tip 
+
+Decorator kavramını daha iyi anlamak için [bu adresi de ](http://simeonfranklin.com/blog/2012/jul/1/python-decorators-in-12-steps/) kullanabilirsiniz
+
+:::

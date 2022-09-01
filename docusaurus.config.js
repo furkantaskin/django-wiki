@@ -98,21 +98,23 @@ const config = {
       prism: {
         theme: lightCodeTheme,
         darkTheme: darkCodeTheme,
-        additionalLanguages: ['powershell', 'rust', 'apacheconf', 'nginx'],
+        additionalLanguages: ['powershell', 'rust', 'apacheconf', 'nginx', 'django'],
         magicComments: [
           {
             className: 'theme-code-block-highlighted-line',
-            line: 'highlight-next-line',
+            line: 'This line active',
             block: { start: 'highlight-start', end: 'highlight-end' },
           },
           {
             className: 'code-block-error-line',
             line: 'This will error',
+            block: { start: 'error started', end: 'error ended' },
           },
         ],
 
       },
     }),
+  themes: ['@docusaurus/theme-live-codeblock'],
 };
 module.exports = config;
 
