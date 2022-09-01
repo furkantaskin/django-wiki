@@ -1,13 +1,144 @@
 ---
 sidebar_position: 3
 custom_edit_url: null
-description: "Python OOP'ta metodlar ve inheritance"
+description: "Python OOP'ta class ve static method kavramları"
 ---
 
-# Methodlar ve Inheritance
+# Metodlar
 
 Artık Python içindeki methodları inceleyebiliz. Hatırlarsak methodları sınıf içindeki özel fonksiyonlar olarak tanımlamıştık. Bunların kendi aralarında özel durumları olabilir. Vakit bunu inceleme vakti.
 
 ## Class ve Static Method
 
- 
+Normalde önceden instancelar üzerinden işlemler yapıyor ve metodları bu instancelar için çağırıyorduk. Ancak bazı durumlarda bunu sınıfa vermemiz ve sınıf içindeki metodlarda işlemler yapmamız gerekebilir. Bunun için çeşitli metodlarımız mevcut. Bunlara class method ve static method diyoruz.
+
+### Class Method
+
+Örneğin önceki örneğimizde bir çalışan sınıfımız vardı ve zam için bir metod kullanıyorduk. Bunu tüm personeller için yapıyorduk. Bunun yerine biz bunu sınıf içerisinde direkt olarak değiştirerek tüm personellerin bu zam oranından faydalanmasını istiyorsak eğer burada kullanabiliriz.
+
+```py
+class Employee():
+    raise_percent = 1.05
+    # This line active
+    num_emp = 0
+    
+    def __init__(self, name, last, age, pay):
+        self.name = name
+        self.last = last
+        self.age = age
+        self.pay = pay
+        # This line active
+        Employee.num_emp += 1
+    
+    def apply_raise(self):
+        self.pay = self.pay * Employee.raise_percent
+
+    @classmethod
+    def set_raise(cls, amount):
+        cls.raise_percent = amount
+```
+
+:::info 
+
+Class method parametre olarak `self` yerine `cls` alır.
+
+:::
+
+Peki nerelerde kullanabiliriz? Normalde biz bir çalışan oluştururken `emp_1 = Employee("Furkan", "Taşkın", 26, 1000)` şeklinde oluşturuyorduk. Ancak bu input bize farklı gelebilir. Örneğin bize `emp_1="Furkan-Taşkın-26-1000"` şeklinde bir string olarak da gelebilir. Bu arkadaşı içeriye eklemek için uzun uzun variable unpacking de yapabiliriz ya da bu tarz inputları otomatik hale de getirebiliriz. Mesela
+
+```py
+class Employee():
+    raise_percent = 1.05
+    # This line active
+    num_emp = 0
+    
+    def __init__(self, name, last, age, pay):
+        self.name = name
+        self.last = last
+        self.age = age
+        self.pay = pay
+        # This line active
+        Employee.num_emp += 1
+    
+    def apply_raise(self):
+        self.pay = self.pay * Employee.raise_percent
+
+    @classmethod
+    def set_raise(cls, amount):
+        cls.raise_percent = amount
+
+    @classmethod
+    def from_string(cls,emp_str):
+        name, last, age, pay = emp_str.split("-")
+        return cls(name,last, int(age), float(pay))
+
+emp_1_str = "Furkan-Taşkın-26-1000"
+emp_2_str = "Diğer-Furkan-22-200"
+
+emp_1 = Employee.from_string(emp_1_str)
+emp_1.pay # 1000 ifadesi dönecektir
+```
+
+### Static Method
+
+Normalde sınıf veya örnekleri (instance) üzerinde işlemler için metodlar kullanıyorduk; ancak bu her zaman sınıf veya örneklere bağlı olarak işlem yapacağımız anlamına gelmiyor. Yeri gelince sadece temel bir işlemi de görmemiz gerekebilir. Örneğin o günün tatil olup olmadığını bilmemiz gerekiyorsa bunu static metod olarak da tanımlayabiliriz. 
+
+<details>
+<summary>İPUÇLARI</summary>
+<p>
+Normalde neden statik metodu bir sınıf içine almamıza gerek var ki diyebiliriz. Çünkü bunu dışarıdan bir fonksiyon ile çağırıp ekrana yazdırmak da aynı işlemi görecektir. Ancak şunu unutmamak gerekir ki OOP prensibinden her işlemin bir nesne içerisinde o nesneye özgü olarak yapılması daha uygun olacaktır. Çünkü okunabilirlik ve fonksiyonellik OOP'un temellerinden bazılarıdır. 
+
+Örneğin personellerimizle tek tek ilişkili olmayan ama tüm personelleri ilgilendiren bir olay düşünelim. Bunu personelimizin sözleşmeleri olarak düşünebiliriz. Sözleşmeler tüm personellerde aynı kaideyi gütmektedir. Bu tür sözleşmeler personelleri kapsar ancak her personel için ayrı bir işlem gerektirmez. İşte bu tarz durumlar için statik metod idealdir.
+
+Mesela personellerimizin sözleşmelerini ekrana döndüren bir statik metod ekleyelim
+
+```py
+class Employee():
+    raise_percent = 1.05
+    # This line active
+    num_emp = 0
+    
+    def __init__(self, name, last, age, pay):
+        self.name = name
+        self.last = last
+        self.age = age
+        self.pay = pay
+        # This line active
+        Employee.num_emp += 1
+    
+    def apply_raise(self):
+        self.pay = self.pay * Employee.raise_percent
+
+    @classmethod
+    def set_raise(cls, amount):
+        cls.raise_percent = amount
+
+    @classmethod
+    def from_string(cls,emp_str):
+        name, last, age, pay = emp_str.split("-")
+        return cls(name,last, int(age), float(pay))
+    
+    @staticmethod
+    def print_obligations_txt():
+        obligations = """
+        Beautiful is better than ugly.
+        Explicit is better than implicit.
+        Simple is better than complex.
+        Complex is better than complicated.
+        Flat is better than nested.
+        Sparse is better than dense.
+        """
+        return obligations
+    
+    @staticmethod
+    def is_holiday(day):
+        if day == "weekend"
+            print("This is an off day")
+        else:
+            print("This is not an off day")
+
+print(Employee.get_employee_legal_obligations_txt())
+print(Employee.is_holiday("weekend"))
+```  
+</p>
+</details>

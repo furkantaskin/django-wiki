@@ -1,0 +1,104 @@
+---
+sidebar_position: 5
+custom_edit_url: null
+description: "Python içinde generator kullanımı"
+---
+
+# Generator
+
+Generator, iterator gibi davranan bir fonksiyon tanımlamamızı sağlayan özel fonksiyonlardır[^1]
+
+Normalde generator kavramı neden var düşünebiliriz. Öncelikle burada biraz Python'ın performans kavramından bahsetmek lazım.
+
+Aslında biz bir liste oluşturup bu listeye sayıları eklediğimizde bu listenin hafızadaki konumu dinamik olarak değişir. Yani 3 elemanlı liste örneğin 3x bir alan tutarken 100 elemanlı liste burada 100x yer tutacaktır. Peki 1 milyon veri eklersek bu listeye hafıza ne hale gelir? Tabii ki de 10 MB'lık yer tutar. Bu elimizdeki 16 GB'lık RAM için az görünebilir ancak kompleks bir büyük işlemle ilgilenirsek burada milyon veriden değil, neredeyse milyarlarca veriden bahsedeceğiz. Bu bizim GB boyutunda veri tutmasına sebep olacak ve RAM'de ciddi şişmelere sebep olacaktır.
+
+İşte Python buna çözüm olarak generator terimini bize sundu.[^2]
+
+Normalde fonksiyonlar bir return değeri alınca kendisini kapatır ve ortalıktan kaybolurdu (ta ki yeniden çağrılana dek). Ancak generator fonksiyonlar tüm döngü bitene kadar kapanmaz ve sürekli veri döndürmeye devam eder.
+
+Mesela elimizdeki devasa bir dizinin tüm elemanlarını karesini alıp yeni bir dizi olmasını istesek?
+
+Normalde bunu oluşturduğumuzuda tüm listeyi hafızaya kaydetmemiz lazım.
+
+```py
+l=[1,2,3]
+print(square(l)) # [1,4,9]
+```
+Burada ufak bir liste hızlıca bitti ancak bu liste çok büyük olursa devasa bir dönüş olacaktır. Bunu daha rahat bir şekilde yapabiliriz.
+
+```py
+def n_square(elem):
+    for e in elem:
+        # This will active
+        yield e*e
+```
+
+Normalde `yield` terimi ile `return` terimi birbirine çok benzer ancak önemli farkları vardır. İkisi de veri döndürür ancak return tüm fonksiyonu kapatırken yield bize o anlık değeri döndürdü. Aslında fonksiyon şu hale geliyor.
+
+```py
+def n_square(elem):
+    for e in elem:
+        # This will active
+        yield e*e
+l = [1,2,3]
+g = n_square(l)
+print(g) # 1
+next(g) # 4
+next(g) # 9
+```
+
+Bakın aslında tüm dizi dönmedi. Dizinin her elemanı için bu fonksiyon çalıştı. Bu çok uğraştırıcı gibi görünsede hafızada ciddi kayıpların önüne geçmeyi sağlar. Peki tek tek uğraşmak istemiyorsak ne olacak? İşte burada bir döngü komutu işin içine giriyor.
+
+```py
+for i in g:
+    print(i)
+"""
+1
+4
+9
+"""
+```
+
+Aslında generatorleri [önceden gördük.](../page2.mdx#list-comprehension)
+
+Örneğin elimizde 1'den 10'a kadar olan bir a listesi olsun. Bunun tüm elemanlarının karesini oluşturan bir liste düşünürsek bunu basitçe şu şekilde oluşturabiliyorduk.
+
+```py
+a= [1,2,3,4,5,6,7,8,9,10]
+b=[x**2 for x in a]
+print(b) # [1,4,9,16,25,36,49,64,81,100]
+```
+
+Aslında a'nın her bir terimi için bir fonksiyon çalışıp bunu b değerindeki diziye ekledi. Bunu liste değil de bir generator yapabiliriz. Tek yapmamız gereken köşeli parantezi normal ile değiştirmek.
+
+```py
+b=(x**2 for x in a)
+print(b) # generator nesne çıktısı verir
+# highlight-start
+next(b) # 1
+next(b) # 4
+# highligh-end
+
+for e in b:
+    print(e) # 9 
+```
+
+Farkındaysak `print(e)` değeri 9 dedik ancak dizimiz 1'den başlıyordu. Bunun sebebi işaretlediğim satırdaki `next` komutları. Bunları silip for döngüsünü yerinde bırakırsak 1 değerinden başlayacaktır.
+
+Örnek bir range fonksiyonu düşünelim
+
+```py
+def range_generator(start,end,step):
+    current = start
+    while current < end
+        yield current
+        current += step
+
+r = range_generator(1,20,3)
+next(r) # 1
+next(r) # 4
+next(r) # 7 
+```
+
+[^1]: https://wiki.python.org/moin/Generators
+[^2]: https://peps.python.org/pep-0255/

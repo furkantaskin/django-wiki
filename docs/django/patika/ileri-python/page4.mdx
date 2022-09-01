@@ -1,0 +1,198 @@
+---
+sidebar_position: 4
+custom_edit_url: null
+description: "Python Inheritance kavramı"
+---
+
+import Mermaid from '@theme/Mermaid';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# Inheritance
+
+Inheritance terimine [önceden](../page2.mdx) kısaca değinmiştik. Özetlemek gerekirse üst bir sınıf veya sınıflardan yeni bir sınıf türetme olayın inheritance (kalıtım) diyoruz. Burada türeten sınıfa super/parent ve türetilen sınıfa sub/child denilebilir.
+
+Normalde inheritance kendi içerisinde çok sayıda çeşit içermektedir. Genel olarak elimizde 6 farklı kalıtım türü bulunmaktadır.Bunlara
+
+- **Single Inheritance (Tekil kalıtım)**: Tek bir parent ve tek bir child şeklindedir. Yani B sınıf direkt olarak A sınıfından türetilmesidir
+- **Multi-level Inheritance(Çok seviyeli kalıtım)**: Bir sınıftan türetilen bir sınıf, başka bir sınıfı türetebilir. Yani A'dan türetilen B sınıfından C sınıfı da türetebiliriz.
+- **Multiple Inheritance (Çoğul kalıtım)**: Birden fazla parent kullanarak bir sınıf türetebiliriz. Örneğin C sınıf, özgün iki farklı sınıf olan A ve B sınıflarından türetilebilir. Bunu tıpkı bir aile gibi düşünebiliriz.
+- **Multipath Inheritance**: Bir D sınıfı düşünelim. Bu D sınıfı iki farklı B ve C sınıfından türetiliyor. Normalde bu çoğul kalıtım gibi durabilir. Ama aslında bu B ve C sınıfı ise A sınıfından türetilmiştir. İşte buna multipath inheritance diyoruz.
+- **Hierarchical Inheritance**: Aslında soy ağacına çok benzer. Ya da düğüm ağacı gibi görünebilir. Detaylı örneği şekilden görebiliriz.
+- **Hybrid Inheritance**: Soy ağacının ta kendisidir. 
+
+
+<Tabs>
+<TabItem value="single" label="Single">
+
+<Mermaid chart={`
+  flowchart TB;
+  A-->B;
+`}/>
+
+</TabItem>
+<TabItem value="multi-level" label="Multi-Level">
+
+<Mermaid chart={`
+  flowchart TB;
+  A1[A]-->B1[B]-->C1[C];
+`}/>
+
+</TabItem>
+<TabItem value="multiple" label="Multiple">
+
+<Mermaid chart={`
+  flowchart TB;
+  A2[A] & B2[B] --> C2[C];
+`}/>
+
+</TabItem>
+<TabItem value="multipath" label="Multipath">
+
+<Mermaid chart={`
+  flowchart TB;
+  A3[A]--> B3[B] & C3[C] --> D3[D]; 
+`}/>
+
+</TabItem>
+<TabItem value="hierarchical" label="Hierarchical">
+
+<Mermaid chart={`
+  flowchart TB;
+  A4[A]--> B4[B] & C4[C];
+  B4[B]--> D4[D] & E4[E];
+  C4[C]--> F4[F] & G4[G];
+`}/>
+
+</TabItem>
+<TabItem value="hybrid" label="Hybrid">
+
+<Mermaid chart={`
+  flowchart TB;
+  A5[A] & F5[F]-->B5[B]
+  A5[A]-->C5[C];
+  C5[C]-->D5[D] & E5[E];
+`}/>
+
+</TabItem>
+</Tabs>
+
+
+Örneğin çalışanlarımızın olduğunu biliyoruz ama bu çalışanların departmandan departmana farklılıkları olduğunu da hesaba katabiliriz. Mesela IT departmanında yıllık zam oranı %10 olabilir. Normalde biz bunu %5 olarak düşünmüştük. 
+
+```py
+class IT(Employee):
+  raise_percent = 1.1
+```
+
+Şimdilik IT sınıfımızı boş düşünelim. Ve bir personel ekleyelim.
+
+```py
+emp_new = IT("Yeni", "Personel", 30, 100)
+```
+
+Türetilen sınıflar eğer kendilerine özel özellikler (attribute) varsa önce ona bakar. Bulamazsa türetildiği sınıfın özelliklerine bakacaktır. Yani biz isim, soyisim, yaş ve maaşı IT içinde tanımlamadığımız için Employee sınıfındakileri alacaktır. Ancak zam oranı olan `raise_percent` değerini kendi sınıfı içinde alacaktır. 
+
+Eğer kendine has veri ekleyeceksek burada ufak bir ekleme yapabiliriz.
+
+```py
+class IT(Employee):
+  def __init__(self, name, last, age, pay, lang):
+    # This line active
+    super().__init__(name, last, age, pay)
+    self.lang = lang
+
+it_emp = ("Foo", "Bar", 10, 4000, "python")
+```
+
+Artık IT içindeki personellerde hangi dilde çalıştıklarını ekleyebiliriz. Buradaki `super().__init__` ibaresi, parent sınıfımızdaki (Employee) `__init__` metodunu baz alacak ve o değerleri direkt olarak oradaki şekilde ekleyerek gelecektir.
+
+Normalde biz tekil kalıtım yaptık. Bunu hiyerarşik kalıtıma çevirebiliriz. Örneğin bir de İK birimi ekleyelim.
+
+```py
+class HR(Employee):
+  def __init__(self, name, last, age, pay, experience):
+    # This line active
+    super().__init__(name, last, age, pay)
+    self.experience = experience
+
+hr_emp = ("Foo", "Bar", 10, 4000, 5)
+```
+
+
+## Dahili Fonksiyonlar
+
+- `isinstance(instance, class)`: Eklediğimiz verinin o sınıfa ait olup olmadığını sorgular. Örneğin `isinstance(hr_emp, HR)` fonksiyonu bize True dönerken HR değerini IT yapmamız durumunda False gelecektir.
+- `issubclass(class, class)`: İlk değerdeki sınıfın ikinci sınıfın altı olup olmadığına bakar. Örneğin `issubclass(HR, Employee)` fonksiyonu bize True verirken Employee değerini IT yaparsak False gelecektir.
+
+
+## Magic Method
+
+Aynı şekilde magic methodlara veya dunder terimine [önceden](../page2.mdx) değinmiştik.
+
+### __str__() Metodu
+Örneğin biz personelimizi print ettiğimizde anlamlı bir çıktı vermesini istiyoruz. Çünkü normalde `print(hr_emp)` dersek bize object bilgilerini verecektir. Bunu daha anlamlı yapmak içn şöyle bir yol izleriz.
+
+```py
+class HR(Employee):
+  def __init__(self, name, last, age, pay, experience):
+    # This line active
+    super().__init__(name, last, age, pay)
+    self.experience = experience
+
+  def __str__(self):
+    print(f"{self.name} {self.last} personelinin {self.age} yaşında olduğunu ve {self.pay} USD maaş aldığını söyleyebiliriz. Ayrıca bu personelin {self.experinece} yıllık deneyimi var")
+
+hr_emp = ("Foo", "Bar", 10, 4000, 5)
+print(hr_emp) 
+# Foo Bar personelinin 10 yaşında olduğunu ve 400 dolar maaş aldığını söyleyebiliriz. Ayrıca bu personelin 5 yıllık deneyimi var.
+```
+
+### __add__() Metodu
+
+Bir diğer metod olarak `__add__` metodunu kullanabiliriz.
+
+```py
+class HR(Employee):
+  def __init__(self, name, last, age, pay, experience):
+    # This line active
+    super().__init__(name, last, age, pay)
+    self.experience = experience
+
+  def __str__(self):
+    print(f"{self.name} {self.last} personelinin {self.age} yaşında olduğunu ve {self.pay} USD maaş aldığını söyleyebiliriz. Ayrıca bu personelin {self.experinece} yıllık deneyimi var")
+  
+  def __add__(self,other):
+    return self.pay + other.pay
+
+hr_emp = ("Foo", "Bar", 10, 4000, 5)
+hr_emp2 = ("Selam", "Naber", 10, 200, 5)
+print(hr_emp + hr_emp2) # 4200
+```
+
+Buradaki `other` terimi başka bir instance ile işlem yapılacağı anlamına gelir. Nasıl ki self bize o anki instance üzerinde bilgi veriyorsa other ise bunun tam tersini kast etmektedir.
+
+### __len__():
+
+```py
+class HR(Employee):
+  def __init__(self, name, last, age, pay, experience):
+    # This line active
+    super().__init__(name, last, age, pay)
+    self.experience = experience
+
+  def __str__(self):
+    print(f"{self.name} {self.last} personelinin {self.age} yaşında olduğunu ve {self.pay} USD maaş aldığını söyleyebiliriz. Ayrıca bu personelin {self.experinece} yıllık deneyimi var")
+  
+  def __add__(self,other):
+    return self.pay + other.pay
+
+  def __len__(self):
+    return len(self.name)
+
+hr_emp = ("Foo", "Bar", 10, 4000, 5)
+hr_emp2 = ("Selam", "Naber", 10, 200, 5)
+print(hr_emp + hr_emp2) # 4200
+len(hr_emp) # 3
+len(hr_emp2) # 5
+```
