@@ -4,34 +4,14 @@ import styles from './styles.module.css';
 
 const FeatureList = [
   {
-    title: 'Easy to Use',
-    Svg: require('@site/static/img/undraw_docusaurus_mountain.svg').default,
-    description: (
-      <>
-        Docusaurus was designed from the ground up to be easily installed and
-        used to get your website up and running quickly.
-      </>
-    ),
-  },
-  {
-    title: 'Focus on What Matters',
+    title: 'Knedime Tatlı Notlar',
     Svg: require('@site/static/img/undraw_docusaurus_tree.svg').default,
     description: (
       <>
-        Docusaurus lets you focus on your docs, and we&apos;ll do the chores. Go
-        ahead and move your docs into the <code>docs</code> directory.
+      Bu siteyi açmamdaki asıl amaç, kendi kendime not tutma alışkanlığımı altyapısı güçlü bir uygulama ile geliştirmekti. Bu süreçte Obsidian'dan Notion'a, Zettlr'den MarkText'e kadar sayısız uygulama kullandım ancak bir şekilde bazı kısımlar eksik gibi hissettim. Burada Docusaurus bana çok yardımcı oldu. 
+      Çevrimdışı notun hızı ile çevrimiçi olarak dilediğim yerden erişebilme özelliği bana büyük fayda sağladı. Yine de başka alternatifler olursa deneyeceğim.
       </>
-    ),
-  },
-  {
-    title: 'Powered by React',
-    Svg: require('@site/static/img/undraw_docusaurus_react.svg').default,
-    description: (
-      <>
-        Extend or customize your website layout by reusing React. Docusaurus can
-        be extended while reusing the same header and footer.
-      </>
-    ),
+    )
   },
 ];
 
